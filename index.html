@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">||RANGA||</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='%23ff0000' filter='drop-shadow(0 0 6px %23ff0000)'/></svg>" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+    <div id="cursor"></div>
+    <canvas id="water-tail"></canvas>
+
+    <div id="enter-screen">
+        <video class="enter-video"
+            src="https://image2url.com/r2/default/videos/1773178239885-4fc6156d-03bd-4dd6-ae95-ba022f2a9959.mp4" autoplay loop muted
+            playsinline></video>
+        <div class="enter-video-overlay"></div>
+        <div id="wind-container"></div>
+        <div class="enter-content">
+            <h1 class="enter-title glitched" data-text="Welcome To My Site Buddy">Welcome To My Site Buddy</h1>
+            <button class="enter-btn glitch-hover" data-text="I'm Here To Look Your Site">I'm Here To Look Your
+                Site</button>
+        </div>
+    </div>
+
+    <div id="background-container">
+        <div id="bg-motion-layer">
+            <video id="bg-video" autoplay loop muted playsinline></video>
+            <div id="background-img" class="ripple-bg"></div>
+        </div>
+        <div id="background-overlay"></div>
+    </div>
+
+    <div id="rain-container"></div>
+
+    <div id="main-content" class="hidden">
+        <div id="audio-control-wrapper">
+            <button id="audio-toggle">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <div class="volume-slider-container">
+                <input type="range" id="volume-slider" min="0" max="100" value="50" />
+            </div>
+        </div>
+
+        <div class="container">
+            <h1 class="title glow" id="profile-name">||RANGA||</h1>
+            <p class="subtitle glow" id="profile-title">Loading...</p>
+
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="profile-location">Loading...</span>
+            </div>
+
+            <div class="discord-card">
+                <div class="avatar-container">
+                    <img src="" alt="Avatar" class="avatar" id="d-avatar" />
+                    <div class="status-indicator" id="d-status-indicator"></div>
+                </div>
+                <div class="discord-info">
+                    <div class="username-wrapper">
+                        <span class="d-username" id="d-username">Loading...</span>
+                        <div class="badges" id="d-badges">
+                        </div>
+                    </div>
+                    <div class="status-wrapper" style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
+                        <img src="" id="d-status-icon"
+                            style="width: 20px; height: 20px; border-radius: 3px; display: none;" />
+                        <span class="d-status-text" id="d-status-text" style="color: red !important;">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="#" target="_blank" class="social-icon" id="link-spotify"><i
+                        class="fa-brands fa-spotify"></i></a>
+                <a href="#" target="_blank" class="social-icon" id="link-tiktok"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#" target="_blank" class="social-icon" id="link-apple"><i class="fa-brands fa-apple"></i></a>
+            </div>
+
+            <div class="music-player">
+                <div class="album-art">
+                    <img src="https://ui-avatars.com/api/?name=Music&background=222&color=f00" alt="Album View"
+                        id="player-album-art" />
+                </div>
+                <div class="player-info">
+                    <div class="song-title glow" id="song-title-text">Loading...</div>
+                    <div class="progress-row">
+                        <span id="current-time">0:00</span>
+                        <div class="progress-bar-bg" id="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                        </div>
+                        <span id="total-time">0:00</span>
+                        <div class="player-buttons">
+                            <i class="fa-solid fa-backward-step"></i>
+                            <i class="fa-solid fa-pause" id="play-pause-btn"></i>
+                            <i class="fa-solid fa-forward-step"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div> <!-- Close container -->
+
+            <div class="my-releases-wrapper scroll-animate" style="margin-top: 50px; width: 100vw; position: relative;">
+                <h2 class="releases-heading" style="text-align: center; margin-bottom: 25px; font-size: 1.2rem; letter-spacing: 2px; font-weight: 800; color: #ff0000; text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #aa0000; padding-bottom: 10px; display: inline-block; position: relative; width: 100%; font-family: 'Inter', sans-serif; text-transform: uppercase;">Listen Now And Visit My Streaming Platforms To More</h2>
+                <div class="spotify-tape-container" style="margin-top: 0; padding: 15px 0;">
+                    <div class="tape-track">
+                        <!-- First Set -->
+                        <div class="tape-items">
+                            <a href="https://open.spotify.com/album/4hw7LfR8aAs7ZqFnxSsZy5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02aaa5d63d4b8a77fb6a5fa618" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONA FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/1wINXLJrOUtDHPxU6p2TeG" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0217b3c7e60b0ed6dc12da7b48" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JUST DANCE FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">GRAVITY FALLS</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0ZdAKqywVFVYbq9Z4QoQQq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e026de62048441bbf1e27eb570f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">FROM THE START</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/5TO6h6b9jv4uDRf8rkZTuo" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020bfb3e410394272225edab0b" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">DA FAVELA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0vzfxkGuyAFgSYmpp8krQf" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0210ba52c359c038c060b061a3" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JACKPOT FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MIDU ECHOING</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/667Uv1HvRJvSd2JcPDO4wz" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0207750ec41d0df10c46a23dee" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM CLIMA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2gqOw7DVpMWWy3E2WGo0f5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02bf5170808acbf5f2b7ef33d2" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM SEMPARA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/6utJ8wJPmlC9BXDg2bH1HW" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e020f59bedb31d8edc871a2a04f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM DELFIM</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Duplicated Set -->
+                        <div class="tape-items">
+                            <a href="https://open.spotify.com/album/4hw7LfR8aAs7ZqFnxSsZy5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02aaa5d63d4b8a77fb6a5fa618" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONA FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/1wINXLJrOUtDHPxU6p2TeG" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0217b3c7e60b0ed6dc12da7b48" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JUST DANCE FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">GRAVITY FALLS</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0ZdAKqywVFVYbq9Z4QoQQq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e026de62048441bbf1e27eb570f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">FROM THE START</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/5TO6h6b9jv4uDRf8rkZTuo" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020bfb3e410394272225edab0b" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">DA FAVELA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0vzfxkGuyAFgSYmpp8krQf" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0210ba52c359c038c060b061a3" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JACKPOT FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MIDU ECHOING</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/667Uv1HvRJvSd2JcPDO4wz" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0207750ec41d0df10c46a23dee" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM CLIMA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2gqOw7DVpMWWy3E2WGo0f5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02bf5170808acbf5f2b7ef33d2" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM SEMPARA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/6utJ8wJPmlC9BXDg2bH1HW" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e020f59bedb31d8edc871a2a04f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM DELFIM</span>
+                            </a>
+                        </div>
+
+                        <!-- Duplicated Set 2 -->
+                        <div class="tape-items">
+                            <a href="https://open.spotify.com/album/4hw7LfR8aAs7ZqFnxSsZy5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02aaa5d63d4b8a77fb6a5fa618" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONA FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/1wINXLJrOUtDHPxU6p2TeG" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0217b3c7e60b0ed6dc12da7b48" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JUST DANCE FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">GRAVITY FALLS</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0ZdAKqywVFVYbq9Z4QoQQq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e026de62048441bbf1e27eb570f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">FROM THE START</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/5TO6h6b9jv4uDRf8rkZTuo" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020bfb3e410394272225edab0b" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">DA FAVELA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0vzfxkGuyAFgSYmpp8krQf" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0210ba52c359c038c060b061a3" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JACKPOT FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MIDU ECHOING</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/667Uv1HvRJvSd2JcPDO4wz" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0207750ec41d0df10c46a23dee" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM CLIMA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2gqOw7DVpMWWy3E2WGo0f5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02bf5170808acbf5f2b7ef33d2" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM SEMPARA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/6utJ8wJPmlC9BXDg2bH1HW" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e020f59bedb31d8edc871a2a04f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM DELFIM</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Duplicated Set 3 -->
+                        <div class="tape-items">
+                            <a href="https://open.spotify.com/album/4hw7LfR8aAs7ZqFnxSsZy5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02aaa5d63d4b8a77fb6a5fa618" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONA FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/1wINXLJrOUtDHPxU6p2TeG" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0217b3c7e60b0ed6dc12da7b48" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JUST DANCE FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">GRAVITY FALLS</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0ZdAKqywVFVYbq9Z4QoQQq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e026de62048441bbf1e27eb570f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">FROM THE START</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/5TO6h6b9jv4uDRf8rkZTuo" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020bfb3e410394272225edab0b" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">DA FAVELA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/0vzfxkGuyAFgSYmpp8krQf" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0210ba52c359c038c060b061a3" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">JACKPOT FUNK</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MIDU ECHOING</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/667Uv1HvRJvSd2JcPDO4wz" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0207750ec41d0df10c46a23dee" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM CLIMA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/2gqOw7DVpMWWy3E2WGo0f5" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02bf5170808acbf5f2b7ef33d2" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM SEMPARA</span>
+                            </a>
+                            <a href="https://open.spotify.com/album/6utJ8wJPmlC9BXDg2bH1HW" target="_blank" class="tape-link">
+                                <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e020f59bedb31d8edc871a2a04f" class="tape-art">
+                                <span class="tape-artist" style="font-weight: 700;">MONTAGEM DELFIM</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="view-counter hidden" id="view-counter-box">
+            <i class="fa-solid fa-clock"></i> <span id="local-time">00:00:00</span>
+        </div>
+
+        <div id="spotify-wrapper">
+            <div class="premium-spotify-box">
+                <div class="spotify-box-glow"></div>
+                <div class="spotify-box-content">
+                    <div class="spotify-header">
+                        <div class="spotify-title">
+                            <i class="fa-brands fa-spotify"></i>
+                            <span>LIVE ARTIST PROFILE</span>
+                        </div>
+                        <div class="spotify-live-indicator">
+                            <span class="live-dot"></span>
+                            <span class="live-text">ONLINE</span>
+                        </div>
+                    </div>
+                    <!-- Box is now fully interactive so the user can select music from the playlist -->
+                    <div class="spotify-iframe-wrapper">
+                        <iframe
+                            src="https://open.spotify.com/embed/artist/6HIP7J771WD2PumlYN7dHD?utm_source=generator&theme=0"
+                            width="100%" height="100%" frameBorder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"></iframe>
+                    </div>
+                    <div class="spotify-footer">
+                        <a href="https://open.spotify.com/artist/6HIP7J771WD2PumlYN7dHD?si=RyClksrjS2WmenMvk-O9hw"
+                            target="_blank" class="spotify-action-btn">
+                            <span>OPEN IN SPOTIFY APP</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="apple-wrapper">
+            <div class="premium-apple-box">
+                <div class="apple-box-glow"></div>
+                <div class="apple-box-content">
+                    <div class="apple-header">
+                        <div class="apple-title">
+                            <i class="fa-brands fa-apple"></i>
+                            <span>APPLE MUSIC PROFILE</span>
+                        </div>
+                        <div class="apple-live-indicator">
+                            <span class="live-dot"></span>
+                            <span class="live-text">ONLINE</span>
+                        </div>
+                    </div>
+                    <div class="apple-iframe-wrapper">
+                        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0"
+                            height="100%" style="width:100%;max-width:660px;overflow:hidden;background:transparent;"
+                            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+                            src="https://embed.music.apple.com/us/album/no-fue-amor-ep/1865385195?theme=dark"></iframe>
+                    </div>
+                    <div class="apple-footer">
+                        <a href="https://music.apple.com/us/album/no-fue-amor-ep/1865385195" target="_blank"
+                            class="apple-action-btn">
+                            <span>OPEN IN APPLE MUSIC</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="obscura-section" class="hidden">
+        <h1 class="obscura-title scroll-animate">OBSCURA RECORDS</h1>
+
+        <p class="obscura-description neon-desc scroll-animate">
+            OBSCURA RECORDS is an independent music label focused on artist development, music production, and official
+            releases.<br />Our mission is to support talented artists and create high-quality music through
+            collaboration and innovation.
+        </p>
+
+        <div class="obscura-invite-wrapper scroll-animate">
+            <a href="https://discord.gg/uyvWq2UN" target="_blank" class="obscura-invite-btn">
+                <i class="fa-brands fa-discord"></i> JOIN SERVER
+            </a>
+        </div>
+
+        <div class="profiles-container">
+            <!-- 1. Owner -->
+            <div class="discord-profile-card">
+                <div class="d-banner" style="background-image: linear-gradient(45deg, #112244, #001122); height: 80px;">
+                </div>
+                <div class="d-card-content" style="padding-top: 25px; text-align: center;">
+                    <div class="role-badge role-owner" style="right: 50%; transform: translateX(50%); top: -15px;">OWNER
+                    </div>
+                    <h2 class="d-name title"
+                        style="font-size: 2rem; letter-spacing: 4px; margin-top: 0; color: #66ccff; text-shadow: 0 0 10px rgba(102,204,255,1), 0 0 20px rgba(102,204,255,0.8), 0 0 40px rgba(102,204,255,0.6), 0 0 80px rgba(102,204,255,0.4);">
+                        SVYUXU</h2>
+
+                    <div class="d-bio-box">
+                        <p>OWNER OF OBSCURA RECORDS</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Admin -->
+            <div class="discord-profile-card">
+                <div class="d-banner" style="background-image: linear-gradient(45deg, #441111, #110000); height: 80px;">
+                </div>
+                <div class="d-card-content" style="padding-top: 25px; text-align: center;">
+                    <div class="role-badge role-admin" style="right: 50%; transform: translateX(50%); top: -15px;">ADMIN
+                    </div>
+                    <h2 class="d-name title" style="font-size: 2rem; letter-spacing: 4px; margin-top: 0;">!RANGA</h2>
+
+                    <div class="d-bio-box">
+                        <p>ADMIN OF OBSCURA RECORDS</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. A&R -->
+            <div class="discord-profile-card">
+                <div class="d-banner" style="background-image: linear-gradient(45deg, #111, #333); height: 80px;"></div>
+                <div class="d-card-content" style="padding-top: 25px; text-align: center;">
+                    <div class="role-badge role-ar" style="right: 50%; transform: translateX(50%); top: -15px;">A&R TEAM
+                    </div>
+                    <h2 class="d-name title"
+                        style="font-size: 2rem; letter-spacing: 4px; margin-top: 0; color: #fff; text-shadow: 0 0 5px #fff, 0 0 15px #d580ff, 0 0 30px #d580ff, 0 0 50px #aa00ff, 0 0 80px #aa00ff;">
+                        - VXIDMXNE -</h2>
+
+                    <div class="d-bio-box">
+                        <p>A&R OF OBSCURA RECORDS</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. A&R (FL4ME) -->
+            <div class="discord-profile-card">
+                <div class="d-banner" style="background-image: linear-gradient(45deg, #112, #335); height: 80px;"></div>
+                <div class="d-card-content" style="padding-top: 25px; text-align: center;">
+                    <div class="role-badge role-ar" style="right: 50%; transform: translateX(50%); top: -15px;">A&R TEAM
+                    </div>
+                    <h2 class="d-name title"
+                        style="font-size: 2.2rem; letter-spacing: 5px; margin-top: 0; color: #fff; text-shadow: 0 0 5px #fff, 0 0 15px #ff6666, 0 0 30px #ff6666, 0 0 50px #ff4444, 0 0 80px #ff0000;">
+                        FL4ME</h2>
+
+                    <div class="d-bio-box">
+                        <p>A&R OF OBSCURA RECORDS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="obscura-footer">
+            <h2 class="footer-title neon-text scroll-animate">We Are The Team Of OBSCURA</h2>
+            <p class="footer-desc neon-desc scroll-animate">Join to the server and make music with other producers</p>
+            <h3 class="footer-thanks scroll-animate">Thank You</h3>
+        </div>
+        <div class="spotify-tape-container">
+            <div class="tape-track">
+                <!-- Original Set 1 -->
+                <div class="tape-items">
+                    <a href="https://open.spotify.com/album/5UjUGkRTqodtoni6VLQJ4t" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021e7234ca35ed22aa3b5d6bc4" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/68lxvBtYV8WAYRVQqWQb1K" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e6df767b61d2c5b8b33d71c1" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/0rrReZ1ZOQzKHoymhzw0ZW" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e58cc340e6580774a3e62d5e" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6MktDdi4f9BGbHbX8tiPYO" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02549226e77adc4a2522923447" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/7wZlx1gIo8MI53tusokhpj" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02fe3f0bc8fe75a73a9e01dca0" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/3W5CFVedLjSFVbTubHnX9P" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0298e9aeb6a3f9be954ba5a31a" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6hDzhelEz77j5B65l6Pwfv" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0224efe9658c0cca9af9f4d8f4" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/13fRxuorQl3YXdpAwk3A68" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a1df6fd8249a52e99677491e" class="tape-art">
+                        <span class="tape-artist">SXVNR</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/1OTVqW97vPGx09kjeBw9Ob" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e023d2f3c7e3a35bc93e1982ec5" class="tape-art">
+                        <span class="tape-artist">FORGOTTEN K8D</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/11pvLdu8DICkTV3Gik1h4V" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e027d3e48ccca636865c20def30" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                </div>
+                
+                <!-- Original Set 2 -->
+                <div class="tape-items">
+                    <a href="https://open.spotify.com/album/5UjUGkRTqodtoni6VLQJ4t" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021e7234ca35ed22aa3b5d6bc4" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/68lxvBtYV8WAYRVQqWQb1K" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e6df767b61d2c5b8b33d71c1" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/0rrReZ1ZOQzKHoymhzw0ZW" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e58cc340e6580774a3e62d5e" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6MktDdi4f9BGbHbX8tiPYO" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02549226e77adc4a2522923447" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/7wZlx1gIo8MI53tusokhpj" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02fe3f0bc8fe75a73a9e01dca0" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/3W5CFVedLjSFVbTubHnX9P" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0298e9aeb6a3f9be954ba5a31a" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6hDzhelEz77j5B65l6Pwfv" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0224efe9658c0cca9af9f4d8f4" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/13fRxuorQl3YXdpAwk3A68" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a1df6fd8249a52e99677491e" class="tape-art">
+                        <span class="tape-artist">SXVNR</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/1OTVqW97vPGx09kjeBw9Ob" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e023d2f3c7e3a35bc93e1982ec5" class="tape-art">
+                        <span class="tape-artist">FORGOTTEN K8D</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/11pvLdu8DICkTV3Gik1h4V" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e027d3e48ccca636865c20def30" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                </div>
+
+                <!-- Original Set 3 -->
+                <div class="tape-items">
+                    <a href="https://open.spotify.com/album/5UjUGkRTqodtoni6VLQJ4t" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e021e7234ca35ed22aa3b5d6bc4" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/68lxvBtYV8WAYRVQqWQb1K" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e6df767b61d2c5b8b33d71c1" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/0rrReZ1ZOQzKHoymhzw0ZW" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e58cc340e6580774a3e62d5e" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6MktDdi4f9BGbHbX8tiPYO" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02549226e77adc4a2522923447" class="tape-art">
+                        <span class="tape-artist">Phetow Rsa</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/7wZlx1gIo8MI53tusokhpj" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02fe3f0bc8fe75a73a9e01dca0" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/3W5CFVedLjSFVbTubHnX9P" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0298e9aeb6a3f9be954ba5a31a" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/6hDzhelEz77j5B65l6Pwfv" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0224efe9658c0cca9af9f4d8f4" class="tape-art">
+                        <span class="tape-artist">FL4ME</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/13fRxuorQl3YXdpAwk3A68" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a1df6fd8249a52e99677491e" class="tape-art">
+                        <span class="tape-artist">SXVNR</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/2vkNxS3Vx4Z5rpNZihmx58" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e021b879e8166497beb5ef233cb" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/1OTVqW97vPGx09kjeBw9Ob" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e023d2f3c7e3a35bc93e1982ec5" class="tape-art">
+                        <span class="tape-artist">FORGOTTEN K8D</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/12lH36h6aNuL5p0GOd6Xwq" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e48370269d3f213762de47ad" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                    <a href="https://open.spotify.com/album/11pvLdu8DICkTV3Gik1h4V" target="_blank" class="tape-link">
+                        <img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e027d3e48ccca636865c20def30" class="tape-art">
+                        <span class="tape-artist">sayuruxt</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-social-section">
+            <h3 class="social-title">CONTACT WITH SOCIAL MEDIA</h3>
+            <div class="bottom-social-links">
+                <a href="https://www.instagram.com/recordsobscura?igsh=NnRhMjQ4dTRrMnQz" target="_blank"
+                    class="b-social-btn flex-center">
+                    <i class="fa-brands fa-instagram"></i>
+                    <span>INSTAGRAM</span>
+                </a>
+                <a href="https://www.tiktok.com/@obscura.records?_r=1&_t=ZS-94a7Rx7BvTb" target="_blank"
+                    class="b-social-btn flex-center">
+                    <i class="fa-brands fa-tiktok"></i>
+                    <span>TIKTOK</span>
+                </a>
+                <a href="https://youtube.com/@obscurarecords1?si=OsjFtvcIk_Etx82h" target="_blank"
+                    class="b-social-btn flex-center">
+                    <i class="fa-brands fa-youtube"></i>
+                    <span>YOUTUBE</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="tape-copyright">
+            <div class="neon-line"></div>
+            <p>COPYRIGHTED BY OBSCURA RECORDS</p>
+            <div class="neon-line"></div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="" type="audio/mpeg" id="audio-source" />
+    </audio>
+
+    <!-- Buttery Smooth Scrolling & JS Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
