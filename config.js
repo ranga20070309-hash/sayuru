@@ -1,8 +1,9 @@
-const CONFIG = {
+window.CONFIG = {
     // General
     name: "||SVYUXU||",
-    tabName: "@SVYUXU",ell
-    title: "Phonk/Funk Artist",
+    tabName: "@SVYUXU",
+    title: "Hello My Friend! A Producer From Mars",
+    location: "Sri Lanka",
 
     // Background & Colors (You can use an Image URL or an MP4 Video URL)
     // Example Video: "https://cdn.pixabay.com/video/2020/05/25/40118-422830846_large.mp4"
@@ -28,5 +29,33 @@ const CONFIG = {
         spotify: "https://open.spotify.com/artist/6HIP7J771WD2PumlYN7dHD?si=W0IFP6UXTKGHv2Zi5PXasQ&nd=1&dlsi=f4f9f5c68a6c466a",
         tiktok: "https://www.tiktok.com/@svyuxu?is_from_webapp=1&sender_device=pc",
         apple: "https://music.apple.com/us/artist/sayuruxt/1788539329"
+    },
+
+    // Enter Screen
+    enterScreen: {
+        videoUrl: "https://image2url.com/r2/default/videos/1773178239885-4fc6156d-03bd-4dd6-ae95-ba022f2a9959.mp4",
+        title: "Welcome",
+        buttonText: "Click Here"
+    },
+
+    // Obscura Info
+    obscuraInfo: {
+        mainTitle: "OBSCURA RECORDS",
+        description: "OBSCURA RECORDS is an independent music label focused on artist development, music production, and official releases.<br />Our mission is to support talented artists and create high-quality music through collaboration and innovation.",
+        inviteUrl: "https://discord.gg/uyvWq2UN",
+        footerTitle: "We Are The Team Of OBSCURA",
+        footerDesc: "Join to the server and make music with other producers",
+        copyrightText: "COPYRIGHTED BY OBSCURA RECORDS"
+    },
+
+    // Latest Single / Release Showcase
+    latestSingle: {
+        title: "NO FUE AMOR",
+        artist: "Cytrena, sayuruxt",
+        coverImg: "https://img.youtube.com/vi/ITI2BisO3Ko/mqdefault.jpg",
+        spotifyLink: "https://open.spotify.com/album/1865385195",
+        appleLink: "https://music.apple.com/us/album/no-fue-amor-ep/1865385195",
+        genre: "Funk / Phonk",
+        releaseDate: "2024"
     }
 };
