@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSCURA OWNER | PANEL</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='%23ff0000' filter='drop-shadow(0 0 6px %23ff0000)'/></svg>" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030303;
+            --sidebar-bg: #0a0a0b;
+            --card-bg: #111113;
+            --input-bg: #0c0c0e;
+            --primary-gradient: linear-gradient(90deg, #ff0055 0%, #ff0000 100%);
+            --text-color: #ffffff;
+            --text-dim: #8a8a8e;
+            --border-color: #1a1a1c;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 15px;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px 40px 15px;
+            font-weight: 900;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .logo i {
+            color: #ff0044;
+            filter: drop-shadow(0 0 5px #ff0044);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            background: var(--primary-gradient);
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .publish-btn-container {
+            padding: 20px 0 0 0;
+        }
+
+        .btn-publish {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-publish:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px 60px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: var(--text-dim);
+            font-size: 1rem;
+        }
+
+        .sync-badge {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .sync-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #43b581;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #43b581;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .input-box {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 20px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-box:focus {
+            border-color: #ff0044;
+            background: rgba(255, 0, 68, 0.02);
+            box-shadow: 0 0 0 3px rgba(255, 0, 68, 0.1);
+        }
+
+        .color-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: none;
+            cursor: pointer;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #43b581;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 80px; }
+            .logo span, .nav-item span, .btn-publish span { display: none; }
+            .main-content { margin-left: 80px; padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-bolt"></i>
+            <span>OBSCURA OWNER</span>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" data-tab="general">
+                <i class="fa-solid fa-user"></i>
+                <span>General Info</span>
+            </div>
+            <div class="nav-item" data-tab="media">
+                <i class="fa-solid fa-palette"></i>
+                <span>Media & Colors</span>
+            </div>
+            <div class="nav-item" data-tab="audio">
+                <i class="fa-solid fa-music"></i>
+                <span>Audio System</span>
+            </div>
+            <div class="nav-item" data-tab="discord">
+                <i class="fa-brands fa-discord"></i>
+                <span>Discord & Lanyard</span>
+            </div>
+            <div class="nav-item" data-tab="social">
+                <i class="fa-solid fa-hashtag"></i>
+                <span>Social Links</span>
+            </div>
+            <div class="nav-item" data-tab="enter">
+                <i class="fa-solid fa-door-open"></i>
+                <span>Enter Screen</span>
+            </div>
+            <div class="nav-item" data-tab="branding">
+                <i class="fa-solid fa-building"></i>
+                <span>Obscura Info</span>
+            </div>
+            <div class="nav-item" data-tab="latest">
+                <i class="fa-solid fa-music"></i>
+                <span>Latest Single</span>
+            </div>
+        </nav>
+
+        <div class="publish-btn-container">
+            <button class="btn-publish" id="save-btn">
+                <i class="fa-solid fa-cloud-upload-alt"></i>
+                <span>Publish Settings</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Dashboard Settings</h1>
+                <p>Live edit your profile dynamically</p>
+            </div>
+            <div class="sync-badge">
+                <div class="dot"></div>
+                Live Synced
+            </div>
+        </header>
+
+        <form id="admin-form">
+            <!-- General Info -->
+            <div class="tab-panel active" id="general">
+                <h2 class="section-title">General Information</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Profile Name</label>
+                            <input type="text" id="cfg-name" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Tab Name (Browser Title)</label>
+                            <input type="text" id="cfg-tabName" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Sub Title</label>
+                            <input type="text" id="cfg-title" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Location Text</label>
+                            <input type="text" id="cfg-location" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media & Colors -->
+            <div class="tab-panel" id="media">
+                <h2 class="section-title">Media & Style</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Background Media URL (Video or Image)</label>
+                            <input type="url" id="cfg-backgroundMedia" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Primary Theme Color</label>
+                            <div class="color-group">
+                                <input type="color" id="cfg-primaryColor">
+                                <span id="color-hex" style="color:var(--text-dim); font-weight:700;">#FF0000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio System -->
+            <div class="tab-panel" id="audio">
+                <h2 class="section-title">Music Player Settings</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Direct Audio Link (.mp3)</label>
+                            <input type="url" id="cfg-audioSrc" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Song Title</label>
+                            <input type="text" id="cfg-songTitle" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Album Art Image URL</label>
+                            <input type="url" id="cfg-albumArt" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discord & Lanyard -->
+            <div class="tab-panel" id="discord">
+                <h2 class="section-title">Lanyard Integration</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Discord ID (for Lanyard API)</label>
+                            <input type="text" id="cfg-discordUserId" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Fallback Username</label>
+                            <input type="text" id="cfg-fallbackDiscordUsername" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Fallback Avatar URL</label>
+                            <input type="url" id="cfg-fallbackDiscordAvatarUrl" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="tab-panel" id="social">
+                <h2 class="section-title">Streaming Platforms</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Spotify Artist Profile URL</label>
+                            <input type="url" id="cfg-socials-spotify" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>TikTok Profile Link</label>
+                            <input type="url" id="cfg-socials-tiktok" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Apple Music Player URL</label>
+                            <input type="url" id="cfg-socials-apple" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enter Screen -->
+            <div class="tab-panel" id="enter">
+                <h2 class="section-title">Landing Screen (Gate)</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Welcome Video URL</label>
+                            <input type="url" id="cfg-enter-video" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Headline Text</label>
+                            <input type="text" id="cfg-enter-title" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Button Action Text</label>
+                            <input type="text" id="cfg-enter-btn" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Obscura Info -->
+            <div class="tab-panel" id="branding">
+                <h2 class="section-title">Branding & Credits</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Label Main Heading</label>
+                            <input type="text" id="cfg-obscura-title" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Brand Description (HTML allowed)</label>
+                            <textarea id="cfg-obscura-desc" class="input-box" style="min-height:100px;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Discord Server Link</label>
+                            <input type="url" id="cfg-obscura-invite" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Copyright Text</label>
+                            <input type="text" id="cfg-obscura-copyright" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Team Footer Title</label>
+                            <input type="text" id="cfg-obscura-footerTitle" class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Team Footer Subtitle</label>
+                            <input type="text" id="cfg-obscura-footerDesc" class="input-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest Single (Placeholders for now) -->
+            <div class="tab-panel" id="latest">
+                <h2 class="section-title">Latest Single Management</h2>
+                <div class="settings-card">
+                    <p style="color:var(--text-dim)">Currently synchronized with your Spotify/Apple embeds.</p>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <div id="toast">Changes Published Successfully!</div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="config.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjzw6S6TmiFBBN-vn3hhM15wW00RXvsJM",
+            authDomain: "sayuru-admin-panel.firebaseapp.com",
+            databaseURL: "https://sayuru-admin-panel-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "sayuru-admin-panel",
+            storageBucket: "sayuru-admin-panel.firebasestorage.app",
+            messagingSenderId: "458294443520",
+            appId: "1:458294443520:web:bd8439a8a78811a4f9e2e5"
+        };
+
+        console.log("OBSCURA OWNER: Initializing Firebase...");
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('site_settings');
+
+        // Tab Mechanism
+        const navItems = document.querySelectorAll('.nav-item');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        navItems.forEach(item => {
+            item.onclick = () => {
+                navItems.forEach(i => i.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                item.classList.add('active');
+                const target = document.getElementById(item.dataset.tab);
+                if(target) target.classList.add('active');
+            };
+        });
+
+        function populate(data) {
+            console.log("OBSCURA OWNER: Populating fields...", data);
+            if(!data) return;
+            try {
+                const setVal = (id, val) => {
+                    const el = document.getElementById(id);
+                    if(el) el.value = val || '';
+                };
+
+                setVal('cfg-name', data.name);
+                setVal('cfg-tabName', data.tabName);
+                setVal('cfg-title', data.title);
+                setVal('cfg-location', data.location);
+                setVal('cfg-backgroundMedia', data.backgroundMedia);
+                setVal('cfg-primaryColor', data.primaryColor || '#ff0000');
+                
+                const hex = document.getElementById('color-hex');
+                if(hex) hex.textContent = (data.primaryColor || '#ff0000').toUpperCase();
+                
+                setVal('cfg-audioSrc', data.audioSrc);
+                setVal('cfg-songTitle', data.songTitle);
+                setVal('cfg-albumArt', data.albumArt);
+                setVal('cfg-discordUserId', data.discordUserId);
+                setVal('cfg-fallbackDiscordUsername', data.fallbackDiscordUsername);
+                setVal('cfg-fallbackDiscordAvatarUrl', data.fallbackDiscordAvatarUrl);
+                
+                if(data.socials) {
+                    setVal('cfg-socials-spotify', data.socials.spotify);
+                    setVal('cfg-socials-tiktok', data.socials.tiktok);
+                    setVal('cfg-socials-apple', data.socials.apple);
+                }
+                if(data.obscuraInfo) {
+                    setVal('cfg-obscura-title', data.obscuraInfo.mainTitle);
+                    setVal('cfg-obscura-desc', data.obscuraInfo.description);
+                    setVal('cfg-obscura-invite', data.obscuraInfo.inviteUrl);
+                    setVal('cfg-obscura-copyright', data.obscuraInfo.copyrightText);
+                    setVal('cfg-obscura-footerTitle', data.obscuraInfo.footerTitle);
+                    setVal('cfg-obscura-footerDesc', data.obscuraInfo.footerDesc);
+                }
+                if(data.enterScreen) {
+                    setVal('cfg-enter-video', data.enterScreen.videoUrl);
+                    setVal('cfg-enter-title', data.enterScreen.title);
+                    setVal('cfg-enter-btn', data.enterScreen.buttonText);
+                }
+            } catch (e) { console.error("Populate Error:", e); }
+        }
+
+        async function load() {
+            if(window.CONFIG) populate(window.CONFIG);
+            db.on('value', snap => {
+                if(snap.exists()) {
+                    console.log("OBSCURA OWNER: Real-time data received from Firebase");
+                    populate(snap.val());
+                    localStorage.setItem('OBSCURA_CONFIG_OVERRIDE', JSON.stringify(snap.val()));
+                }
+            });
+        }
+
+        function collect() {
+            console.log("OBSCURA OWNER: Collecting data from form...");
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+
+            return {
+                name: getVal('cfg-name'),
+                tabName: getVal('cfg-tabName'),
+                title: getVal('cfg-title'),
+                location: getVal('cfg-location'),
+                backgroundMedia: getVal('cfg-backgroundMedia'),
+                primaryColor: getVal('cfg-primaryColor'),
+                audioSrc: getVal('cfg-audioSrc'),
+                songTitle: getVal('cfg-songTitle'),
+                albumArt: getVal('cfg-albumArt'),
+                discordUserId: getVal('cfg-discordUserId'),
+                fallbackDiscordUsername: getVal('cfg-fallbackDiscordUsername'),
+                fallbackDiscordAvatarUrl: getVal('cfg-fallbackDiscordAvatarUrl'),
+                socials: {
+                    spotify: getVal('cfg-socials-spotify'),
+                    tiktok: getVal('cfg-socials-tiktok'),
+                    apple: getVal('cfg-socials-apple')
+                },
+                obscuraInfo: {
+                    mainTitle: getVal('cfg-obscura-title'),
+                    description: getVal('cfg-obscura-desc'),
+                    inviteUrl: getVal('cfg-obscura-invite'),
+                    copyrightText: getVal('cfg-obscura-copyright'),
+                    footerTitle: getVal('cfg-obscura-footerTitle'),
+                    footerDesc: getVal('cfg-obscura-footerDesc')
+                },
+                enterScreen: {
+                    videoUrl: getVal('cfg-enter-video'),
+                    title: getVal('cfg-enter-title'),
+                    buttonText: getVal('cfg-enter-btn')
+                }
+            };
+        }
+
+        const saveBtn = document.getElementById('save-btn');
+        if(saveBtn) {
+            saveBtn.onclick = async () => {
+                console.log("OBSCURA OWNER: Publish button clicked!");
+                try {
+                    const data = collect();
+                    console.log("OBSCURA OWNER: Data to save:", data);
+                    
+                    await db.set(data);
+                    console.log("OBSCURA OWNER: Firebase SET successful!");
+                    
+                    localStorage.setItem('OBSCURA_CONFIG_OVERRIDE', JSON.stringify(data));
+                    
+                    const t = document.getElementById('toast');
+                    if(t) {
+                        t.style.display = 'block';
+                        setTimeout(() => t.style.display = 'none', 3000);
+                    }
+                    alert("Changes Published Successfully!");
+                } catch (error) {
+                    console.error("OBSCURA OWNER: Firebase SAVE ERROR:", error);
+                    alert("Error saving: " + error.message);
+                }
+            };
+        } else {
+            console.error("OBSCURA OWNER: Save button NOT found!");
+        }
+
+        const colorInput = document.getElementById('cfg-primaryColor');
+        if(colorInput) {
+            colorInput.oninput = (e) => {
+                const hex = document.getElementById('color-hex');
+                if(hex) hex.textContent = e.target.value.toUpperCase();
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', load);
+    </script>
+</body>
+</html>
