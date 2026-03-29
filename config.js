@@ -3,7 +3,7 @@ const CONFIG = {
     name: "||SVYUXU||",
     tabName: "@SVYUXU",ell
     title: "Phonk/Funk Artist",
-    location: "",
+    location: "JAPAN",
 
     // Background & Colors (You can use an Image URL or an MP4 Video URL)
     // Example Video: "https://cdn.pixabay.com/video/2020/05/25/40118-422830846_large.mp4"
