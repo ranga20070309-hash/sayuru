@@ -8,6 +8,141 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
+        /* Login Overlay Styling */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a1c 0%, #030303 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-card {
+            background: rgba(15, 15, 17, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 50px;
+            border-radius: 30px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
+            animation: cardAppear 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            color: #ff0044;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 68, 0.5));
+        }
+
+        .login-card h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 35px;
+        }
+
+        .login-form {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .login-input-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-left: 5px;
+        }
+
+        .login-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #ff0044;
+            box-shadow: 0 0 0 4px rgba(255, 0, 68, 0.1);
+        }
+
+        .btn-login {
+            background: var(--primary-gradient);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 0, 68, 0.2);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 0, 68, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #login-error-msg {
+            color: #ff4757;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            min-height: 1.2em;
+        }
+
+        /* Hide main UI until logged in */
+        body:not(.authenticated) .sidebar,
+        body:not(.authenticated) .main-content {
+            display: none !important;
+        }
+
+
         :root {
             --bg-color: #030303;
             --sidebar-bg: #0a0a0b;
@@ -283,6 +418,33 @@
 </head>
 <body>
 
+    <!-- Login Security Overlay -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h2>Restricted Access</h2>
+            <p>Authentication required to manage OBSCURA settings.</p>
+            
+            <form class="login-form" id="login-form">
+                <div class="login-input-group">
+                    <label>Admin Email</label>
+                    <input type="email" id="login-email" class="login-input" placeholder="admin@obscura.com" required>
+                </div>
+                <div class="login-input-group">
+                    <label>Access Key</label>
+                    <input type="password" id="login-password" class="login-input" placeholder="••••••••" required>
+                </div>
+                <div id="login-error-msg"></div>
+                <button type="submit" class="btn-login" id="login-submit-btn">
+                    <span>Unlock Dashboard</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
     <aside class="sidebar">
         <div class="logo">
             <i class="fa-solid fa-bolt"></i>
@@ -322,6 +484,14 @@
                 <i class="fa-solid fa-music"></i>
                 <span>Latest Single</span>
             </div>
+            
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <div class="nav-item" id="logout-btn" style="color: #ff4757;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </div>
+            </div>
+
         </nav>
 
         <div class="publish-btn-container">
@@ -521,7 +691,9 @@
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <script src="config.js"></script>
 
     <script>
@@ -601,6 +773,26 @@
         }
 
         async function load() {
+            // Authentication Check
+            firebase.auth().onAuthStateChanged(user => {
+                const overlay = document.getElementById('login-overlay');
+                if (user) {
+                    console.log("OBSCURA OWNER: Authenticated as", user.email);
+                    document.body.classList.add('authenticated');
+                    if(overlay) {
+                        overlay.style.opacity = '0';
+                        setTimeout(() => overlay.style.display = 'none', 500);
+                    }
+                } else {
+                    console.log("OBSCURA OWNER: Not authenticated");
+                    document.body.classList.remove('authenticated');
+                    if(overlay) {
+                        overlay.style.display = 'flex';
+                        overlay.style.opacity = '1';
+                    }
+                }
+            });
+
             if(window.CONFIG) populate(window.CONFIG);
             db.on('value', snap => {
                 if(snap.exists()) {
@@ -609,6 +801,47 @@
                     localStorage.setItem('OBSCURA_CONFIG_OVERRIDE', JSON.stringify(snap.val()));
                 }
             });
+        }
+
+        // Login Handler
+        const loginForm = document.getElementById('login-form');
+        if(loginForm) {
+            loginForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const btn = document.getElementById('login-submit-btn');
+                const errMsg = document.getElementById('login-error-msg');
+
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+                errMsg.textContent = '';
+
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    console.error("Login Error:", error);
+                    let message = "Authentication failed. Please check your credentials.";
+                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        message = "Invalid email or access key.";
+                    } else if(error.code === 'auth/too-many-requests') {
+                        message = "Too many failed attempts. Try again later.";
+                    }
+                    errMsg.textContent = message;
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Unlock Dashboard</span>';
+                }
+            };
+        }
+
+        // Logout Handler
+        const logoutBtn = document.getElementById('logout-btn');
+        if(logoutBtn) {
+            logoutBtn.onclick = () => {
+                if(confirm("Are you sure you want to sign out?")) {
+                    firebase.auth().signOut();
+                }
+            };
         }
 
         function collect() {
@@ -676,11 +909,11 @@
                     alert("Error saving: " + error.message);
                 }
             };
-        } else {
-            console.error("OBSCURA OWNER: Save button NOT found!");
         }
 
         const colorInput = document.getElementById('cfg-primaryColor');
+
+
         if(colorInput) {
             colorInput.oninput = (e) => {
                 const hex = document.getElementById('color-hex');
