@@ -381,6 +381,7 @@
 
         input[type="color"] {
             -webkit-appearance: none;
+            appearance: none;
             border: none;
             width: 40px;
             height: 40px;
@@ -483,6 +484,10 @@
             <div class="nav-item" data-tab="latest">
                 <i class="fa-solid fa-music"></i>
                 <span>Latest Single</span>
+            </div>
+            <div class="nav-item" data-tab="account" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px;">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Account Settings</span>
             </div>
             
             <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
@@ -684,6 +689,37 @@
                     <p style="color:var(--text-dim)">Currently synchronized with your Spotify/Apple embeds.</p>
                 </div>
             </div>
+
+            <!-- Account Settings -->
+            <div class="tab-panel" id="account">
+                <h2 class="section-title">Account Security</h2>
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Admin Email</label>
+                            <input type="email" id="acc-email" class="input-box" placeholder="new-email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Admin Username (Display Name)</label>
+                            <input type="text" id="acc-username" class="input-box" placeholder="New Username">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password (Leave blank to keep current)</label>
+                            <input type="password" id="acc-password" class="input-box" placeholder="••••••••">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <button type="button" class="btn-login" id="update-acc-btn" style="width: fit-content; padding: 12px 30px; margin-top: 10px; background: linear-gradient(90deg, #43b581 0%, #2ebf91 100%); box-shadow: 0 10px 20px rgba(46, 191, 145, 0.2);">
+                                <i class="fa-solid fa-shield-halved"></i> Update Credentials
+                            </button>
+                            <p style="color:var(--text-dim); font-size: 0.85rem; line-height: 1.5;">
+                                <i class="fa-solid fa-circle-info" style="color: #43b581;"></i> 
+                                For security reasons, changing your email or password requires a <strong>recent login</strong>. 
+                                if you get an error, please sign out and sign back in before updating.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </main>
 
@@ -783,6 +819,12 @@
                         overlay.style.opacity = '0';
                         setTimeout(() => overlay.style.display = 'none', 500);
                     }
+                    
+                    // Pre-fill account info
+                    const accEmail = document.getElementById('acc-email');
+                    const accUser = document.getElementById('acc-username');
+                    if(accEmail) accEmail.value = user.email || '';
+                    if(accUser) accUser.value = user.displayName || '';
                 } else {
                     console.log("OBSCURA OWNER: Not authenticated");
                     document.body.classList.remove('authenticated');
@@ -918,6 +960,85 @@
             colorInput.oninput = (e) => {
                 const hex = document.getElementById('color-hex');
                 if(hex) hex.textContent = e.target.value.toUpperCase();
+            };
+        }
+
+        // Account Update Handler
+        const updateAccBtn = document.getElementById('update-acc-btn');
+        if(updateAccBtn) {
+            updateAccBtn.onclick = async () => {
+                const user = firebase.auth().currentUser;
+                if(!user) {
+                    alert("No authenticated user found.");
+                    return;
+                }
+
+                const newEmail = document.getElementById('acc-email').value.trim();
+                const newUsername = document.getElementById('acc-username').value.trim();
+                const newPassword = document.getElementById('acc-password').value.trim();
+
+                if(!newEmail && !newUsername && !newPassword) {
+                    alert("Please fill in at least one field to update.");
+                    return;
+                }
+
+                updateAccBtn.disabled = true;
+                const originalText = updateAccBtn.innerHTML;
+                updateAccBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing Updates...';
+
+                try {
+                    let actions = [];
+                    
+                    // Update Email if changed
+                    if(newEmail && newEmail !== user.email) {
+                        console.log("Updating Email to:", newEmail);
+                        actions.push(user.updateEmail(newEmail));
+                    }
+                    
+                    // Update Display Name if changed
+                    if(newUsername && newUsername !== user.displayName) {
+                        console.log("Updating Username to:", newUsername);
+                        actions.push(user.updateProfile({ displayName: newUsername }));
+                    }
+                    
+                    // Update Password if provided
+                    if(newPassword) {
+                        console.log("Updating Password...");
+                        actions.push(user.updatePassword(newPassword));
+                    }
+
+                    if(actions.length > 0) {
+                        await Promise.all(actions);
+                        
+                        const t = document.getElementById('toast');
+                        if(t) {
+                            t.textContent = "Account Updated Successfully!";
+                            t.style.display = 'block';
+                            setTimeout(() => {
+                                t.style.display = 'none';
+                                t.textContent = "Changes Published Successfully!";
+                            }, 3000);
+                        }
+                        
+                        alert("Account info updated successfully!");
+                        
+                        // Clear password field
+                        document.getElementById('acc-password').value = '';
+                    } else {
+                        alert("No changes detected.");
+                    }
+
+                } catch (error) {
+                    console.error("Account Update Error:", error);
+                    if(error.code === 'auth/requires-recent-login') {
+                        alert("Security check failed: Changing sensitive info requires a recent login. Please log out and log back in, then try again immediately.");
+                    } else {
+                        alert("Update failed: " + error.message);
+                    }
+                } finally {
+                    updateAccBtn.disabled = false;
+                    updateAccBtn.innerHTML = originalText;
+                }
             };
         }
 
