@@ -74,9 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const locContainer = profileLocation.closest('.location');
             if (CONFIG.location && CONFIG.location.trim() !== "") {
                 profileLocation.textContent = CONFIG.location;
-                if(locContainer) locContainer.style.display = "flex";
+                if (locContainer) locContainer.style.display = "flex";
             } else {
-                if(locContainer) locContainer.style.display = "none";
+                if (locContainer) locContainer.style.display = "none";
             }
         }
 
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (bgVideo.src !== mediaUrl) {
                 bgVideo.src = mediaUrl;
                 bgVideo.load();
-                bgVideo.play().catch(() => {});
+                bgVideo.play().catch(() => { });
             }
             bgVideo.style.display = "block";
             if (bgImg) bgImg.style.display = "none";
@@ -105,13 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (CONFIG.enterScreen) {
             const enterVid = document.querySelector(".enter-video");
             if (enterVid && enterVid.src !== CONFIG.enterScreen.videoUrl) enterVid.src = CONFIG.enterScreen.videoUrl;
-            
+
             const enterTitle = document.querySelector(".enter-title");
             if (enterTitle) {
                 enterTitle.textContent = CONFIG.enterScreen.title;
                 enterTitle.setAttribute("data-text", CONFIG.enterScreen.title);
             }
-            
+
             const enterBtn = document.querySelector(".enter-btn");
             if (enterBtn) {
                 enterBtn.textContent = CONFIG.enterScreen.buttonText;
@@ -139,19 +139,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if (CONFIG.obscuraInfo) {
             const obsTitle = document.querySelector(".obscura-title");
             if (obsTitle) obsTitle.textContent = CONFIG.obscuraInfo.mainTitle;
-            
+
             const obsDesc = document.querySelector(".obscura-description");
             if (obsDesc) obsDesc.innerHTML = CONFIG.obscuraInfo.description;
-            
+
             const obsInvite = document.querySelector(".obscura-invite-btn");
             if (obsInvite) obsInvite.href = CONFIG.obscuraInfo.inviteUrl;
-            
+
             const fTitle = document.querySelector(".footer-title");
             if (fTitle) fTitle.textContent = CONFIG.obscuraInfo.footerTitle;
-            
+
             const fDesc = document.querySelector(".footer-desc");
             if (fDesc) fDesc.textContent = CONFIG.obscuraInfo.footerDesc;
-            
+
             const copyright = document.querySelector(".tape-copyright p");
             if (copyright) copyright.textContent = CONFIG.obscuraInfo.copyrightText;
         }
@@ -159,11 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to setup one-time Event Listeners
     function setupEventListeners() {
-        const enterScreen = document.getElementById("enter-screen"), 
-              enterBtn = document.querySelector(".enter-btn"), 
-              mainContent = document.getElementById("main-content"), 
-              audio = document.getElementById("bg-music"), 
-              playPauseBtn = document.getElementById("play-pause-btn");
+        const enterScreen = document.getElementById("enter-screen"),
+            enterBtn = document.querySelector(".enter-btn"),
+            mainContent = document.getElementById("main-content"),
+            audio = document.getElementById("bg-music"),
+            playPauseBtn = document.getElementById("play-pause-btn");
 
         let isPlaying = false;
 
@@ -182,12 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 audio.volume = 0.5;
                 audio.play().then(() => {
                     isPlaying = true;
-                    if(playPauseBtn) playPauseBtn.className = "fa-solid fa-pause";
+                    if (playPauseBtn) playPauseBtn.className = "fa-solid fa-pause";
                 }).catch(e => console.log("Audio play failed:", e));
 
                 // BG Video
                 const bgVideo = document.getElementById("bg-video");
-                if (bgVideo) bgVideo.play().catch(() => {});
+                if (bgVideo) bgVideo.play().catch(() => { });
 
                 // Entrance
                 enterScreen.classList.add("enter-leaving");
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     enterScreen.style.display = "none";
                     document.body.classList.add("scroll-enabled");
                     mainContent.classList.remove("hidden");
-                    
+
                     // Show blocks with staggered animation
                     const blocks = [
                         document.querySelector(".container"),
@@ -216,11 +216,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Audio controls listeners (Once)
         const audioToggle = document.getElementById("audio-toggle"),
-              volumeSlider = document.getElementById("volume-slider"),
-              pbBg = document.getElementById("progress-bar-bg"),
-              pbFill = document.getElementById("progress-bar-fill"),
-              curT = document.getElementById("current-time"),
-              totT = document.getElementById("total-time");
+            volumeSlider = document.getElementById("volume-slider"),
+            pbBg = document.getElementById("progress-bar-bg"),
+            pbFill = document.getElementById("progress-bar-fill"),
+            curT = document.getElementById("current-time"),
+            totT = document.getElementById("total-time");
 
         if (audioToggle) audioToggle.onclick = () => {
             audio.muted = !audio.muted;
@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         if (audio) {
-            audio.onloadedmetadata = () => { if(totT) totT.textContent = formatTime(audio.duration); };
+            audio.onloadedmetadata = () => { if (totT) totT.textContent = formatTime(audio.duration); };
             audio.ontimeupdate = () => {
                 if (audio.duration && pbFill && curT) {
                     pbFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (pbBg) pbBg.onclick = (e) => {
-            if(audio.duration) audio.currentTime = (e.offsetX / pbBg.clientWidth) * audio.duration;
+            if (audio.duration) audio.currentTime = (e.offsetX / pbBg.clientWidth) * audio.duration;
         };
 
         if (playPauseBtn) playPauseBtn.onclick = () => {
@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 const user = data.data;
                 if (!user) return;
-                
+
                 const dAvatar = document.getElementById("d-avatar");
                 const dUsername = document.getElementById("d-username");
                 const dStatus = document.getElementById("d-status-indicator");
@@ -291,16 +291,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (dAvatar) dAvatar.src = user.discord_user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.webp?size=256` : CONFIG.fallbackDiscordAvatarUrl;
                 if (dUsername) dUsername.textContent = user.discord_user.global_name || user.discord_user.username || CONFIG.fallbackDiscordUsername;
-                
+
                 // Status colors
                 const colors = { online: "#43b581", idle: "#faa61a", dnd: "#f04747", offline: "#747f8d" };
                 if (dStatus) dStatus.style.background = colors[user.discord_status] || colors.offline;
-                
+
                 // Activity text
                 if (dStatusText) {
                     const custom = user.activities.find(a => a.type === 4);
                     const game = user.activities.find(a => a.type === 0);
-                    
+
                     if (custom && (custom.state || custom.emoji)) {
                         let statusHtml = '';
                         if (custom.emoji) {
@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Custom Cursor Movement
     const cursor = document.getElementById("cursor");
     window.addEventListener("mousemove", (e) => {
-        if(cursor) {
+        if (cursor) {
             cursor.style.left = e.clientX + "px";
             cursor.style.top = e.clientY + "px";
         }
@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Smooth Scroll (Lenis)
-    if(typeof Lenis !== 'undefined') {
+    if (typeof Lenis !== 'undefined') {
         const lenis = new Lenis();
         function raf(time) {
             lenis.raf(time);
