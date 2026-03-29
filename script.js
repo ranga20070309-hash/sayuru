@@ -5,727 +5,366 @@ if (history.scrollRestoration) {
 window.scrollTo(0, 0);
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Initialize Lenis for Buttery Smooth Scrolling
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-        direction: 'vertical',
-        gestureDirection: 'vertical',
-        smooth: true,
-        smoothTouch: false,
-        touchMultiplier: 2,
-    });
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjzw6S6TmiFBBN-vn3hhM15wW00RXvsJM",
+        authDomain: "sayuru-admin-panel.firebaseapp.com",
+        databaseURL: "https://sayuru-admin-panel-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        projectId: "sayuru-admin-panel",
+        storageBucket: "sayuru-admin-panel.firebasestorage.app",
+        messagingSenderId: "458294443520",
+        appId: "1:458294443520:web:bd8439a8a78811a4f9e2e5"
+    };
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+    // Global site settings override from cloud
+    const initializeCloudSync = () => {
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+            const settingsRef = database.ref('site_settings');
 
-    // Load CONFIG
-    document.getElementById("page-title").textContent = CONFIG.name;
-
-    const profileNameEl = document.getElementById("profile-name");
-    profileNameEl.innerHTML = CONFIG.name;
-    profileNameEl.setAttribute("data-text", CONFIG.name);
-
-    document.getElementById("profile-title").textContent = CONFIG.title;
-    document.getElementById("profile-location").textContent = CONFIG.location;
-
-    // Tab Title Animation (Scrolling)
-    const titleText = (CONFIG.tabName || "@SVYUXU") + "   \u2022   ";
-    let titleIndex = 0;
-
-    setInterval(() => {
-        document.title = titleText.substring(titleIndex) + titleText.substring(0, titleIndex);
-        titleIndex = (titleIndex + 1) % titleText.length;
-    }, 400);
-
-    document.documentElement.style.setProperty("--primary-color", CONFIG.primaryColor);
-    document.documentElement.style.setProperty("--primary-glow", CONFIG.primaryColor + "B3");
-
-    // Background media
-    const mediaUrl = CONFIG.backgroundMedia;
-    const bgVideo = document.getElementById("bg-video");
-    const bgImg = document.getElementById("background-img");
-    const bgMotionLayer = document.getElementById("bg-motion-layer");
-
-    const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(mediaUrl || "");
-
-    if (isVideo) {
-        bgVideo.src = mediaUrl;
-        bgVideo.muted = true;
-        bgVideo.loop = true;
-        bgVideo.setAttribute("playsinline", "");
-        bgVideo.setAttribute("webkit-playsinline", "");
-        bgVideo.setAttribute("autoplay", "");
-        bgVideo.style.display = "block";
-        bgImg.style.display = "none";
-        bgVideo.load();
-
-        const forcePlay = (vid) => {
-            const p = vid.play();
-            if (p !== undefined) p.catch(() => {});
-        };
-
-        // Aggressive handling for ALL videos to never freeze
-        const enforceVideo = (vid) => {
-            vid.muted = true;
-            vid.loop = true;
-            vid.setAttribute("playsinline", "");
-            vid.setAttribute("webkit-playsinline", "");
-            vid.setAttribute("autoplay", "");
-            
-            // Native loop fallback
-            vid.addEventListener("ended", () => {
-                vid.currentTime = 0;
-                forcePlay(vid);
-            });
-            // Prevent auto-pausing by browser
-            vid.addEventListener("pause", () => {
-                if (vid.currentTime > 0 && !vid.ended) {
-                    forcePlay(vid);
+            settingsRef.on('value', (snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    console.log("OBSCURA OWNER: Updating site from cloud...");
+                    // Merge cloud data into local CONFIG
+                    Object.assign(window.CONFIG, cloudData);
+                    // Re-render UI with new data
+                    renderSiteData();
                 }
             });
-            forcePlay(vid);
-        };
-
-        enforceVideo(bgVideo);
-
-        const enterVideo = document.querySelector('.enter-video');
-        if (enterVideo) {
-            enforceVideo(enterVideo);
-            // On user click, we also force the 2nd screen background video to play to overcome iOS restrictions
-            document.body.addEventListener("click", () => forcePlay(bgVideo), { once: true });
         }
+    };
 
-        bgVideo.addEventListener("error", () => {
-            console.log("Background video failed to load.");
-        });
-    } else {
-        bgImg.style.display = "block";
-        bgImg.style.backgroundImage = `url('${mediaUrl}')`;
-        bgVideo.style.display = "none";
-    }
-
-    // Fake VR / cinema motion
-    let pointerX = 0;
-    let pointerY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let currentRotX = 0;
-    let currentRotY = 0;
-
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-
-    const autoPanStrength = isTouchDevice ? 6 : 10;
-    const mouseStrengthX = 50;
-    const mouseStrengthY = 25;
-    const rotateStrength = 3.5;
-
-    // Wrap the container for middle details parallax without breaking CSS animations
-    const containerEl = document.querySelector(".container");
-    let parallaxWrapper = null;
-    if (containerEl && containerEl.parentNode) {
-        parallaxWrapper = document.createElement("div");
-        parallaxWrapper.style.width = "100%";
-        parallaxWrapper.style.display = "flex";
-        parallaxWrapper.style.flexDirection = "column";
-        parallaxWrapper.style.alignItems = "center";
-        parallaxWrapper.style.perspective = "1200px";
-        parallaxWrapper.style.transformStyle = "preserve-3d";
-        parallaxWrapper.classList.add("js-parallax-wrapper");
-        
-        containerEl.parentNode.insertBefore(parallaxWrapper, containerEl);
-        parallaxWrapper.appendChild(containerEl);
-    }
-
-    document.addEventListener("mousemove", (e) => {
-        if (isTouchDevice) return;
-
-        const x = (e.clientX / window.innerWidth) - 0.5;
-        const y = (e.clientY / window.innerHeight) - 0.5;
-
-        pointerX = -x * mouseStrengthX;
-        pointerY = -y * mouseStrengthY;
-    });
-
-    function handleOrientation(event) {
-        if (!event.gamma || !event.beta) return;
-        
-        let x = event.gamma; // -90 to 90
-        let y = event.beta;  // -180 to 180
-        
-        // Clamp ranges to prevent extreme flips
-        if (x > 45) x = 45;
-        if (x < -45) x = -45;
-        
-        // Assume holding phone at ~45 degrees is neutral
-        y = y - 45; 
-        if (y > 45) y = 45;
-        if (y < -45) y = -45;
-        
-        const normX = x / 45; 
-        const normY = y / 45; 
-        
-        // Responsively update the same pointer variables used for background logic
-        pointerX = -normX * mouseStrengthX * 0.8;
-        pointerY = -normY * mouseStrengthY * 0.8;
-    }
-
-    function animateBackground(time) {
-        const t = time * 0.00022;
-
-        const autoPanX = Math.sin(t) * autoPanStrength;
-        const autoPanY = Math.sin(t * 0.45) * 1.8;
-
-        currentX += ((autoPanX + pointerX) - currentX) * 0.04;
-        currentY += ((autoPanY + pointerY) - currentY) * 0.05;
-
-        const targetRotY = (currentX / 28) * rotateStrength;
-        const targetRotX = (-currentY / 22) * rotateStrength;
-
-        currentRotY += (targetRotY - currentRotY) * 0.04;
-        currentRotX += (targetRotX - currentRotX) * 0.04;
-
-        // Apply CSS variables for generic elements
-        document.documentElement.style.setProperty('--mx', currentX);
-        document.documentElement.style.setProperty('--my', currentY);
-        document.documentElement.style.setProperty('--rx', currentRotX);
-        document.documentElement.style.setProperty('--ry', currentRotY);
-
-        requestAnimationFrame(animateBackground);
-    }
-
-    requestAnimationFrame(animateBackground);
-
-    // Discord fallback
-    const fallbackAvatar = CONFIG.fallbackDiscordAvatarUrl;
-    document.getElementById("d-avatar").src = fallbackAvatar;
-    document.getElementById("d-username").textContent = CONFIG.fallbackDiscordUsername;
-    document.getElementById("d-status-indicator").style.backgroundColor = "#747f8d";
-    document.getElementById("d-status-text").textContent = "Connecting to Discord...";
-
-    // Lanyard
-    const discordId = CONFIG.discordUserId;
-    if (discordId !== "") {
-        function connectLanyard() {
-            const ws = new WebSocket("wss://api.lanyard.rest/socket");
-
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-
-                if (message.op === 1) {
-                    ws.send(JSON.stringify({
-                        op: 2,
-                        d: { subscribe_to_id: discordId }
-                    }));
-                } else if (message.op === 0) {
-                    if (message.t === "INIT_STATE" || message.t === "PRESENCE_UPDATE") {
-                        const data = message.d;
-                        const user = data.discord_user;
-
-                        if (user.avatar) {
-                            const ext = user.avatar.startsWith("a_") ? "gif" : "png";
-                            document.getElementById("d-avatar").src =
-                                `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=128`;
-                        } else {
-                            document.getElementById("d-avatar").src = fallbackAvatar;
-                        }
-
-                        document.getElementById("d-username").textContent = user.global_name || user.username || CONFIG.fallbackDiscordUsername;
-
-                        // Clear out the hardcoded badges since this is now dynamically another profile.
-                        document.getElementById("d-badges").innerHTML = "";
-
-                        const statusColors = {
-                            online: "#43b581",
-                            idle: "#faa61a",
-                            dnd: "#f04747",
-                            offline: "#747f8d"
-                        };
-
-                        document.getElementById("d-status-indicator").style.backgroundColor =
-                            statusColors[data.discord_status] || "#747f8d";
-
-                        const customStatus = data.activities.find((a) => a.type === 4);
-
-                        if (customStatus) {
-                            let text = "";
-                            const statusIcon = document.getElementById("d-status-icon");
-
-                            if (customStatus.emoji) {
-                                if (customStatus.emoji.id) {
-                                    const ext = customStatus.emoji.animated ? "gif" : "png";
-                                    statusIcon.src = `https://cdn.discordapp.com/emojis/${customStatus.emoji.id}.${ext}`;
-                                    statusIcon.style.display = "block";
-                                } else {
-                                    text += customStatus.emoji.name + " ";
-                                    statusIcon.style.display = "none";
-                                }
-                            } else {
-                                statusIcon.style.display = "none";
-                            }
-
-                            if (customStatus.state) text += customStatus.state;
-                            document.getElementById("d-status-text").textContent =
-                                text || (data.discord_status === "offline" ? "Offline" : "Online");
-                        } else {
-                            document.getElementById("d-status-icon").style.display = "none";
-                            document.getElementById("d-status-text").textContent =
-                                data.discord_status === "offline" ? "Offline" : "Online";
-                        }
-                    }
-                }
-            };
-
-            ws.onclose = () => {
-                setTimeout(connectLanyard, 5000);
-            };
-        }
-
-        connectLanyard();
-    } else {
-        document.getElementById("d-status-text").textContent = "Please add your Discord ID in config.js";
-    }
-
-    document.getElementById("link-spotify").href = CONFIG.socials.spotify;
-    document.getElementById("link-tiktok").href = CONFIG.socials.tiktok;
-    document.getElementById("link-apple").href = CONFIG.socials.apple;
-
-    // Music
-    document.getElementById("song-title-text").textContent = CONFIG.songTitle;
-    document.getElementById("audio-source").src = CONFIG.audioSrc;
-
-    const albumArtEl = document.getElementById("player-album-art");
-    if (albumArtEl && CONFIG.albumArt) {
-        albumArtEl.src = CONFIG.albumArt;
-    }
-
-    const audio = document.getElementById("bg-music");
-    audio.load();
-
-    // Custom cursor and water tail
-    const cursor = document.getElementById("cursor");
-    const canvas = document.getElementById("water-tail");
-    const ctx = canvas ? canvas.getContext("2d") : null;
-
-    if (cursor) {
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let cursorX = mouseX;
-        let cursorY = mouseY;
-        // Extremely realistic Rippling Water effect
-        let ripples = [];
-        let r_lastTime = 0;
-
-        if (canvas) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
-
-        document.addEventListener("mousemove", (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            cursor.style.opacity = "1";
-
-            if (canvas) {
-                let now = Date.now();
-                if (now - r_lastTime > 400) { // Very slow bubble creation rate (less frequent)
-                    ripples.push({
-                        x: mouseX,
-                        y: mouseY,
-                        radius: 0,
-                        maxRadius: Math.random() * 20 + 50, // Don't expand too huge
-                        speed: Math.random() * 0.2 + 0.3, // Very slow expansion speed
-                        life: 1, // Full opacity
-                        thickness: 2 // Clear neon line thickness
-                    });
-                    r_lastTime = now;
-                }
-            }
-        });
-
-        document.addEventListener("mouseleave", () => {
-            cursor.style.opacity = "0";
-        });
-
-        document.addEventListener("mouseenter", () => {
-            cursor.style.opacity = "1";
-        });
-
-        function animateCursor() {
-            cursorX += (mouseX - cursorX) * 0.35;
-            cursorY += (mouseY - cursorY) * 0.35;
-
-            cursor.style.left = cursorX + "px";
-            cursor.style.top = cursorY + "px";
-
-            // Draw hyper-realistic ripples
-            if (ctx && canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                for (let i = ripples.length - 1; i >= 0; i--) {
-                    let r = ripples[i];
-                    r.radius += r.speed;
-                    // Ease-out life (fade slower initially, faster at the end)
-                    let progress = r.radius / r.maxRadius;
-                    r.life = 1 - Math.pow(progress, 1.5);
-                    
-                    if (r.life <= 0) {
-                        ripples.splice(i, 1);
-                        continue;
-                    }
-                    
-                    // Clear realistic Neon Red ripple (No heavy blur, sharp and bright)
-                    ctx.beginPath();
-                    ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-                    ctx.lineWidth = r.thickness; 
-                    
-                    // Main bright solid red line
-                    ctx.strokeStyle = `rgba(255, 0, 0, ${r.life})`; 
-                    
-                    // Subtle sharp neon glow
-                    ctx.shadowColor = `rgba(255, 0, 0, ${r.life * 0.8})`;
-                    ctx.shadowBlur = 5; // Low blur for clear edge
-                    
-                    ctx.stroke();
-                }
-            }
-
-            requestAnimationFrame(animateCursor);
-        }
-
-        animateCursor();
-
-        const clickables = document.querySelectorAll("a, button, .discord-card, .progress-bar-bg, .player-buttons i, input, .social-icon");
-        clickables.forEach((el) => {
-            el.addEventListener("mouseenter", () => cursor.classList.add("cursor-hover"));
-            el.addEventListener("mouseleave", () => cursor.classList.remove("cursor-hover"));
-        });
-
-        const spotifyBox = document.querySelector(".premium-spotify-box");
-        if (spotifyBox) {
-            spotifyBox.addEventListener("mouseenter", () => cursor.classList.add("hide-cursor"));
-            spotifyBox.addEventListener("mouseleave", () => cursor.classList.remove("hide-cursor"));
-        }
-
-        const appleBox = document.querySelector(".premium-apple-box");
-        if (appleBox) {
-            appleBox.addEventListener("mouseenter", () => cursor.classList.add("hide-cursor"));
-            appleBox.addEventListener("mouseleave", () => cursor.classList.remove("hide-cursor"));
+    // Check for local admin preview override
+    const localOverride = localStorage.getItem('OBSCURA_CONFIG_OVERRIDE');
+    if (localOverride) {
+        try {
+            const parsed = JSON.parse(localOverride);
+            Object.assign(window.CONFIG, parsed);
+        } catch (e) {
+            console.error("Local override failed:", e);
         }
     }
 
-    const enterScreen = document.getElementById("enter-screen");
-    const enterBtn = document.querySelector(".enter-btn");
-    const mainContent = document.getElementById("main-content");
-    const audioToggle = document.getElementById("audio-toggle");
-    const playPauseBtn = document.getElementById("play-pause-btn");
+    // Function to only update text/images/colors from CONFIG
+    function renderSiteData() {
+        const pageTitle = document.getElementById("page-title");
+        const profileName = document.getElementById("profile-name");
+        const profileTitle = document.getElementById("profile-title");
+        const profileLocation = document.getElementById("profile-location");
+        const bgVideo = document.getElementById("bg-video");
+        const bgImg = document.getElementById("background-img");
+        const songTitleText = document.getElementById("song-title-text");
+        const playerAlbumArt = document.getElementById("player-album-art");
+        const linkSpotify = document.getElementById("link-spotify");
+        const linkTiktok = document.getElementById("link-tiktok");
+        const linkApple = document.getElementById("link-apple");
+        const audioSource = document.getElementById("audio-source");
+        const audio = document.getElementById("bg-music");
 
-    let isPlaying = false;
-
-    enterBtn.addEventListener("click", () => {
-        // Request Device Orientation Permission for iOS 13+
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(permissionState => {
-                    if (permissionState === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                    }
-                })
-                .catch(console.error);
-        } else {
-            // For other mobile devices
-            window.addEventListener('deviceorientation', handleOrientation);
+        // General Info
+        if (pageTitle) pageTitle.textContent = CONFIG.tabName || CONFIG.name;
+        if (profileName) {
+            profileName.textContent = CONFIG.name;
+            profileName.setAttribute("data-text", CONFIG.name);
         }
-
-        // Play audio and video strictly on user gesture matching (fixes iOS and Safari pausing)
-        audio.volume = 0.5;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                isPlaying = true;
-                updatePlayPauseIcon();
-            }).catch(() => {
-                console.log("Audio permission denied.");
-            });
-        }
-
-        if (isVideo) {
-            bgVideo.play().catch(() => console.log("Background video play skipped."));
-        }
-
-        enterScreen.classList.add("enter-leaving");
-
-        setTimeout(() => {
-            enterScreen.style.display = "none";
-            document.body.classList.add("scroll-enabled");
-            mainContent.classList.remove("hidden");
-            
-            // Apply staggering entry animation to main content blocks
-            const blocksToAnimate = [
-                document.querySelector(".container"),
-                document.getElementById("view-counter-box"),
-                document.getElementById("apple-wrapper"),
-                document.getElementById("spotify-wrapper"),
-                document.getElementById("obscura-section"),
-                document.querySelector(".spotify-tape-container"),
-                document.querySelector(".bottom-social-section"),
-                document.querySelector(".tape-copyright")
-            ];
-            
-            blocksToAnimate.forEach((block, index) => {
-                if (block) {
-                    block.style.opacity = "0";
-                    block.style.animation = `mainEntrance 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) ${0.2 + (index * 0.15)}s forwards`;
-                }
-            });
-            
-            const obscuraSection = document.getElementById("obscura-section");
-            if (obscuraSection) obscuraSection.classList.remove("hidden");
-
-            const viewCounterBox = document.getElementById("view-counter-box");
-            if (viewCounterBox) viewCounterBox.classList.remove("hidden");
-        }, 1100); // Wait for the 1.2s exit animation to almost finish before showing new content
-    });
-
-    // Enforce video playback continuously
-    setInterval(() => {
-        if (isVideo && bgVideo.paused) {
-            bgVideo.play().catch(() => {});
-        }
-    }, 1000);
-
-    audioToggle.addEventListener("click", () => {
-        audio.muted = !audio.muted;
-        audioToggle.innerHTML = audio.muted
-            ? '<i class="fa-solid fa-volume-xmark"></i>'
-            : '<i class="fa-solid fa-volume-high"></i>';
-    });
-
-    const volumeSlider = document.getElementById("volume-slider");
-    if (volumeSlider) {
-        volumeSlider.addEventListener("input", (e) => {
-            const vol = e.target.value / 100;
-            audio.volume = vol;
-
-            if (vol === 0) {
-                audio.muted = true;
-                audioToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+        if (profileTitle) profileTitle.textContent = CONFIG.title;
+        if (profileLocation) {
+            const locContainer = profileLocation.closest('.location');
+            if (CONFIG.location && CONFIG.location.trim() !== "") {
+                profileLocation.textContent = CONFIG.location;
+                if(locContainer) locContainer.style.display = "flex";
             } else {
-                audio.muted = false;
-                audioToggle.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                if(locContainer) locContainer.style.display = "none";
             }
-        });
-    }
-
-    // Player math
-    const progressBarBg = document.getElementById("progress-bar-bg");
-    const progressBarFill = document.getElementById("progress-bar-fill");
-    const currentTimeEl = document.getElementById("current-time");
-    const totalTimeEl = document.getElementById("total-time");
-
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-    }
-
-    audio.addEventListener("loadedmetadata", () => {
-        totalTimeEl.textContent = formatTime(audio.duration);
-    });
-
-    audio.addEventListener("timeupdate", () => {
-        if (audio.duration) {
-            const progressPercent = (audio.currentTime / audio.duration) * 100;
-            progressBarFill.style.width = progressPercent + "%";
-            currentTimeEl.textContent = formatTime(audio.currentTime);
-        }
-    });
-
-    progressBarBg.addEventListener("click", (e) => {
-        const width = progressBarBg.clientWidth;
-        const clickX = e.offsetX;
-        const duration = audio.duration;
-        audio.currentTime = (clickX / width) * duration;
-    });
-
-    playPauseBtn.addEventListener("click", () => {
-        if (isPlaying) {
-            audio.pause();
-            isPlaying = false;
-        } else {
-            audio.play();
-            isPlaying = true;
-        }
-        updatePlayPauseIcon();
-    });
-
-    function updatePlayPauseIcon() {
-        playPauseBtn.className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
-    }
-
-    // Rain
-    const rainContainer = document.getElementById("rain-container");
-
-    function createRaindrop() {
-        if (document.hidden) return;
-
-        const drop = document.createElement("div");
-        drop.classList.add("raindrop");
-        // Start from -20vw up to 130vw to account for the angled fall
-        drop.style.left = (Math.random() * 150 - 20) + "vw";
-
-        const duration = Math.random() * 0.3 + 0.2; // Faster drops
-        drop.style.animationDuration = duration + "s";
-        drop.style.opacity = Math.random() * 0.45 + 0.1;
-        drop.style.height = (Math.random() * 40 + 60) + "px";
-
-        // Add depth to realistic rain (some drops closer/blurred)
-        const depth = Math.random();
-        if (depth < 0.3) {
-            drop.style.filter = "blur(1.5px)";
-            drop.style.zIndex = "1";
-        } else if (depth > 0.8) {
-            drop.style.filter = "blur(3px)";
-            drop.style.zIndex = "3";
-        } else {
-            drop.style.zIndex = "-1";
         }
 
-        rainContainer.appendChild(drop);
-        setTimeout(() => drop.remove(), duration * 1000);
-    }
+        // Theme / Primary Color
+        document.documentElement.style.setProperty("--primary-color", CONFIG.primaryColor);
+        document.documentElement.style.setProperty("--primary-glow", CONFIG.primaryColor + "B3");
 
-    setInterval(createRaindrop, 25);
-
-    // Global Local Time
-    function updateLocalTime() {
-        const timeBox = document.getElementById("local-time");
-        if (timeBox) {
-            const now = new Date();
-            // Format time dynamically for the user's specific timezone (country)
-            const timeString = now.toLocaleTimeString(undefined, {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            });
-            timeBox.textContent = timeString;
-        }
-    }
-    
-    // Initial call
-    updateLocalTime();
-    // Update every second
-    setInterval(updateLocalTime, 1000);
-
-    // Mobile scroll animation for premium widgets
-    const premiumWidgets = document.querySelectorAll(".premium-spotify-box, .premium-apple-box");
-    if (premiumWidgets.length > 0) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("in-view");
-                } else {
-                    entry.target.classList.remove("in-view");
-                }
-            });
-        }, {
-            threshold: 0.3 // Trigger when 30% of the widget is visible
-        });
-        
-        premiumWidgets.forEach(widget => observer.observe(widget));
-    }
-
-    // Scroll animation for Discord cards
-    const obscuraCards = document.querySelectorAll(".discord-profile-card");
-    if (obscuraCards.length > 0) {
-        const cardObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add("in-view");
-                    }, index * 200); // Staggered reveal effect
-                }
-            });
-        }, {
-            threshold: 0.2
-        });
-        
-        obscuraCards.forEach(card => cardObserver.observe(card));
-    }
-
-    // Scroll animation for regular elements (Title, Desc, Button)
-    const scrollElements = document.querySelectorAll(".scroll-animate");
-    if (scrollElements.length > 0) {
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("in-view");
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        scrollElements.forEach(el => scrollObserver.observe(el));
-    }
-
-    // Realistic Wind Effect for Enter Screen
-    function initWindEffect() {
-        const windContainer = document.getElementById("wind-container");
-        if (!windContainer) return;
-
-        let isRunning = true;
-
-        function createParticle(isDust) {
-            if (!isRunning) return;
-            const particle = document.createElement("div");
-            particle.classList.add(isDust ? "wind-dust" : "wind-streak");
-            
-            particle.style.top = Math.random() * 100 + "%";
-            
-            if (!isDust) {
-                particle.style.width = (Math.random() * 200 + 50) + "px";
-                particle.style.animationDuration = (Math.random() * 0.5 + 0.3) + "s";
-                particle.style.opacity = Math.random() * 0.3 + 0.1;
-            } else {
-                const size = (Math.random() * 3 + 2) + "px";
-                particle.style.width = size;
-                particle.style.height = size;
-                particle.style.setProperty("--drift-y", (Math.random() * 40 - 20) + "vh");
-                particle.style.animationDuration = (Math.random() * 1.5 + 0.5) + "s";
-                particle.style.opacity = Math.random() * 0.5 + 0.2;
+        // Background media
+        const mediaUrl = CONFIG.backgroundMedia;
+        const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(mediaUrl || "");
+        if (isVideo && bgVideo) {
+            if (bgVideo.src !== mediaUrl) {
+                bgVideo.src = mediaUrl;
+                bgVideo.load();
+                bgVideo.play().catch(() => {});
             }
-
-            windContainer.appendChild(particle);
-            
-            setTimeout(() => {
-                if (particle.parentNode) particle.remove();
-            }, parseInt(particle.style.animationDuration) * 1000); // Wait for animation to finish
+            bgVideo.style.display = "block";
+            if (bgImg) bgImg.style.display = "none";
+        } else if (bgImg) {
+            bgImg.style.display = "block";
+            bgImg.style.backgroundImage = `url('${mediaUrl}')`;
+            if (bgVideo) bgVideo.style.display = "none";
         }
 
-        // Generate particles occasionally
-        const streakInterval = setInterval(() => createParticle(false), 80);
-        const dustInterval = setInterval(() => createParticle(true), 40);
+        // Enter Screen
+        if (CONFIG.enterScreen) {
+            const enterVid = document.querySelector(".enter-video");
+            if (enterVid && enterVid.src !== CONFIG.enterScreen.videoUrl) enterVid.src = CONFIG.enterScreen.videoUrl;
+            
+            const enterTitle = document.querySelector(".enter-title");
+            if (enterTitle) {
+                enterTitle.textContent = CONFIG.enterScreen.title;
+                enterTitle.setAttribute("data-text", CONFIG.enterScreen.title);
+            }
+            
+            const enterBtn = document.querySelector(".enter-btn");
+            if (enterBtn) {
+                enterBtn.textContent = CONFIG.enterScreen.buttonText;
+                enterBtn.setAttribute("data-text", CONFIG.enterScreen.buttonText);
+            }
+        }
 
-        // Stop wind and clean up when entering site
-        const enterBtn = document.querySelector(".enter-btn");
+        // Music
+        if (songTitleText) songTitleText.textContent = CONFIG.songTitle;
+        if (playerAlbumArt) playerAlbumArt.src = CONFIG.albumArt;
+        if (audioSource && audioSource.src !== CONFIG.audioSrc) {
+            audioSource.src = CONFIG.audioSrc;
+            if (audio) {
+                audio.load();
+                // We don't play here to wait for Enter button interaction
+            }
+        }
+
+        // Socials
+        if (linkSpotify && CONFIG.socials) linkSpotify.href = CONFIG.socials.spotify;
+        if (linkTiktok && CONFIG.socials) linkTiktok.href = CONFIG.socials.tiktok;
+        if (linkApple && CONFIG.socials) linkApple.href = CONFIG.socials.apple;
+
+        // Discord / Obscura Info Branding
+        if (CONFIG.obscuraInfo) {
+            const obsTitle = document.querySelector(".obscura-title");
+            if (obsTitle) obsTitle.textContent = CONFIG.obscuraInfo.mainTitle;
+            
+            const obsDesc = document.querySelector(".obscura-description");
+            if (obsDesc) obsDesc.innerHTML = CONFIG.obscuraInfo.description;
+            
+            const obsInvite = document.querySelector(".obscura-invite-btn");
+            if (obsInvite) obsInvite.href = CONFIG.obscuraInfo.inviteUrl;
+            
+            const fTitle = document.querySelector(".footer-title");
+            if (fTitle) fTitle.textContent = CONFIG.obscuraInfo.footerTitle;
+            
+            const fDesc = document.querySelector(".footer-desc");
+            if (fDesc) fDesc.textContent = CONFIG.obscuraInfo.footerDesc;
+            
+            const copyright = document.querySelector(".tape-copyright p");
+            if (copyright) copyright.textContent = CONFIG.obscuraInfo.copyrightText;
+        }
+    }
+
+    // Function to setup one-time Event Listeners
+    function setupEventListeners() {
+        const enterScreen = document.getElementById("enter-screen"), 
+              enterBtn = document.querySelector(".enter-btn"), 
+              mainContent = document.getElementById("main-content"), 
+              audio = document.getElementById("bg-music"), 
+              playPauseBtn = document.getElementById("play-pause-btn");
+
+        let isPlaying = false;
+
         if (enterBtn) {
             enterBtn.addEventListener("click", () => {
-                isRunning = false;
-                clearInterval(streakInterval);
-                clearInterval(dustInterval);
+                // Audio Context permission
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission().then(state => {
+                        if (state === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+                    });
+                } else {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+
+                // Initial Play
+                audio.volume = 0.5;
+                audio.play().then(() => {
+                    isPlaying = true;
+                    if(playPauseBtn) playPauseBtn.className = "fa-solid fa-pause";
+                }).catch(e => console.log("Audio play failed:", e));
+
+                // BG Video
+                const bgVideo = document.getElementById("bg-video");
+                if (bgVideo) bgVideo.play().catch(() => {});
+
+                // Entrance
+                enterScreen.classList.add("enter-leaving");
+                setTimeout(() => {
+                    enterScreen.style.display = "none";
+                    document.body.classList.add("scroll-enabled");
+                    mainContent.classList.remove("hidden");
+                    
+                    // Show blocks with staggered animation
+                    const blocks = [
+                        document.querySelector(".container"),
+                        document.getElementById("view-counter-box"),
+                        document.getElementById("apple-wrapper"),
+                        document.getElementById("spotify-wrapper"),
+                        document.getElementById("obscura-section")
+                    ];
+                    blocks.forEach((b, i) => {
+                        if (b) {
+                            b.style.opacity = "0";
+                            b.style.animation = `mainEntrance 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) ${0.2 + (i * 0.15)}s forwards`;
+                        }
+                    });
+                }, 1100);
             });
         }
+
+        // Audio controls listeners (Once)
+        const audioToggle = document.getElementById("audio-toggle"),
+              volumeSlider = document.getElementById("volume-slider"),
+              pbBg = document.getElementById("progress-bar-bg"),
+              pbFill = document.getElementById("progress-bar-fill"),
+              curT = document.getElementById("current-time"),
+              totT = document.getElementById("total-time");
+
+        if (audioToggle) audioToggle.onclick = () => {
+            audio.muted = !audio.muted;
+            audioToggle.innerHTML = audio.muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+        };
+
+        if (volumeSlider) volumeSlider.oninput = (e) => {
+            audio.volume = e.target.value / 100;
+            audio.muted = (audio.volume === 0);
+        };
+
+        if (audio) {
+            audio.onloadedmetadata = () => { if(totT) totT.textContent = formatTime(audio.duration); };
+            audio.ontimeupdate = () => {
+                if (audio.duration && pbFill && curT) {
+                    pbFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+                    curT.textContent = formatTime(audio.currentTime);
+                }
+            };
+        }
+
+        if (pbBg) pbBg.onclick = (e) => {
+            if(audio.duration) audio.currentTime = (e.offsetX / pbBg.clientWidth) * audio.duration;
+        };
+
+        if (playPauseBtn) playPauseBtn.onclick = () => {
+            if (isPlaying) {
+                audio.pause();
+                playPauseBtn.className = "fa-solid fa-play";
+            } else {
+                audio.play();
+                playPauseBtn.className = "fa-solid fa-pause";
+            }
+            isPlaying = !isPlaying;
+        };
     }
-    
-    initWindEffect();
+
+    // Helper functions
+    function formatTime(s) {
+        if (isNaN(s)) return "0:00";
+        let m = Math.floor(s / 60);
+        let sc = Math.floor(s % 60);
+        return `${m}:${sc < 10 ? "0" : ""}${sc}`;
+    }
+
+    function handleOrientation(e) {
+        const x = e.gamma; // -90 to 90
+        const y = e.beta;  // -180 to 180
+        document.documentElement.style.setProperty('--mx', (x * 0.5) + "px");
+        document.documentElement.style.setProperty('--my', (y * 0.5) + "px");
+    }
+
+    // Lanyard Discord Integration
+    const fetchDiscord = () => {
+        const lanyardId = CONFIG.discordUserId;
+        if (!lanyardId) return;
+
+        fetch(`https://api.lanyard.rest/v1/users/${lanyardId}`)
+            .then(r => r.json())
+            .then(data => {
+                const user = data.data;
+                if (!user) return;
+                
+                const dAvatar = document.getElementById("d-avatar");
+                const dUsername = document.getElementById("d-username");
+                const dStatus = document.getElementById("d-status-indicator");
+                const dStatusText = document.getElementById("d-status-text");
+
+                if (dAvatar) dAvatar.src = user.discord_user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.webp?size=256` : CONFIG.fallbackDiscordAvatarUrl;
+                if (dUsername) dUsername.textContent = user.discord_user.global_name || user.discord_user.username || CONFIG.fallbackDiscordUsername;
+                
+                // Status colors
+                const colors = { online: "#43b581", idle: "#faa61a", dnd: "#f04747", offline: "#747f8d" };
+                if (dStatus) dStatus.style.background = colors[user.discord_status] || colors.offline;
+                
+                // Activity text
+                if (dStatusText) {
+                    const custom = user.activities.find(a => a.type === 4);
+                    const game = user.activities.find(a => a.type === 0);
+                    
+                    if (custom && (custom.state || custom.emoji)) {
+                        let statusHtml = '';
+                        if (custom.emoji) {
+                            if (custom.emoji.id) {
+                                const ext = custom.emoji.animated ? 'gif' : 'webp';
+                                statusHtml += `<img src="https://cdn.discordapp.com/emojis/${custom.emoji.id}.${ext}?size=44&quality=lossless" style="height:1.2em; vertical-align:middle; margin-right:4px;"> `;
+                            } else {
+                                statusHtml += custom.emoji.name + " ";
+                            }
+                        }
+                        statusHtml += custom.state || '';
+                        dStatusText.innerHTML = statusHtml;
+                    } else if (game) {
+                        dStatusText.textContent = `Playing ${game.name}`;
+                    } else {
+                        dStatusText.textContent = user.discord_status.toUpperCase();
+                    }
+                }
+            })
+            .catch(e => console.error("Discord load failed:", e));
+    };
+
+    // Observers / Scroll Anims
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add("in-view");
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".scroll-animate, .premium-spotify-box, .premium-apple-box, .discord-profile-card").forEach(el => scrollObserver.observe(el));
+
+    // Live Time
+    setInterval(() => {
+        const timeBox = document.getElementById("local-time");
+        if (timeBox) timeBox.textContent = new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    }, 1000);
+
+    // Initial Execution
+    renderSiteData();        // Render from local CONFIG immediately
+    setupEventListeners();    // Connect buttons once
+    initializeCloudSync();   // Setup real-time firebase updates
+    fetchDiscord();           // Load Discord info
+    setInterval(fetchDiscord, 30000); // Update discord every 30s
+
+    // Custom Cursor Movement
+    const cursor = document.getElementById("cursor");
+    window.addEventListener("mousemove", (e) => {
+        if(cursor) {
+            cursor.style.left = e.clientX + "px";
+            cursor.style.top = e.clientY + "px";
+        }
+    });
+
+    document.querySelectorAll("a, button, .nav-item, .tape-link, .enter-btn, .audio-control").forEach(el => {
+        el.addEventListener("mouseenter", () => cursor?.classList.add("cursor-hover"));
+        el.addEventListener("mouseleave", () => cursor?.classList.remove("cursor-hover"));
+    });
+
+    // Smooth Scroll (Lenis)
+    if(typeof Lenis !== 'undefined') {
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+    }
 });
