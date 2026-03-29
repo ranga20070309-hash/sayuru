@@ -63,8 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const audioSource = document.getElementById("audio-source");
         const audio = document.getElementById("bg-music");
 
-        // General Info
-        if (pageTitle) pageTitle.textContent = CONFIG.tabName || CONFIG.name;
+        // General Info (Title is handled by typing animation)
         if (profileName) {
             profileName.textContent = CONFIG.name;
             profileName.setAttribute("data-text", CONFIG.name);
@@ -273,55 +272,84 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty('--my', (y * 0.5) + "px");
     }
 
-    // Lanyard Discord Integration
+    // Lanyard Discord Integration (Websocket for Live updates)
+    let lanyardWS = null;
+    const updateDiscordUI = (user) => {
+        if (!user) return;
+        const dAvatar = document.getElementById("d-avatar");
+        const dUsername = document.getElementById("d-username");
+        const dStatus = document.getElementById("d-status-indicator");
+        const dStatusText = document.getElementById("d-status-text");
+
+        if (dAvatar) dAvatar.src = user.discord_user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.webp?size=256` : window.CONFIG.fallbackDiscordAvatarUrl;
+        if (dUsername) dUsername.textContent = user.discord_user.global_name || user.discord_user.username || window.CONFIG.fallbackDiscordUsername;
+
+        const colors = { online: "#43b581", idle: "#faa61a", dnd: "#f04747", offline: "#747f8d" };
+        if (dStatus) dStatus.style.background = colors[user.discord_status] || colors.offline;
+
+        if (dStatusText) {
+            const activities = user.activities || [];
+            const custom = activities.find(a => a.type === 4);
+            const game = activities.find(a => a.type === 0);
+
+            if (custom && (custom.state || custom.emoji)) {
+                let statusHtml = '';
+                if (custom.emoji) {
+                    if (custom.emoji.id) {
+                        const ext = custom.emoji.animated ? 'gif' : 'webp';
+                        statusHtml += `<img src="https://cdn.discordapp.com/emojis/${custom.emoji.id}.${ext}?size=44&quality=lossless" style="height:1.2em; vertical-align:middle; margin-right:4px;"> `;
+                    } else {
+                        statusHtml += custom.emoji.name + " ";
+                    }
+                }
+                statusHtml += custom.state || '';
+                dStatusText.innerHTML = statusHtml;
+            } else if (game) {
+                dStatusText.textContent = `Playing ${game.name}`;
+            } else {
+                dStatusText.textContent = user.discord_status.toUpperCase();
+            }
+        }
+    };
+
     const fetchDiscord = () => {
-        const lanyardId = CONFIG.discordUserId;
+        const lanyardId = window.CONFIG?.discordUserId;
         if (!lanyardId) return;
 
+        // One-time fetch for current state and cache
         fetch(`https://api.lanyard.rest/v1/users/${lanyardId}`)
             .then(r => r.json())
             .then(data => {
-                const user = data.data;
-                if (!user) return;
-
-                const dAvatar = document.getElementById("d-avatar");
-                const dUsername = document.getElementById("d-username");
-                const dStatus = document.getElementById("d-status-indicator");
-                const dStatusText = document.getElementById("d-status-text");
-
-                if (dAvatar) dAvatar.src = user.discord_user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.webp?size=256` : CONFIG.fallbackDiscordAvatarUrl;
-                if (dUsername) dUsername.textContent = user.discord_user.global_name || user.discord_user.username || CONFIG.fallbackDiscordUsername;
-
-                // Status colors
-                const colors = { online: "#43b581", idle: "#faa61a", dnd: "#f04747", offline: "#747f8d" };
-                if (dStatus) dStatus.style.background = colors[user.discord_status] || colors.offline;
-
-                // Activity text
-                if (dStatusText) {
-                    const custom = user.activities.find(a => a.type === 4);
-                    const game = user.activities.find(a => a.type === 0);
-
-                    if (custom && (custom.state || custom.emoji)) {
-                        let statusHtml = '';
-                        if (custom.emoji) {
-                            if (custom.emoji.id) {
-                                const ext = custom.emoji.animated ? 'gif' : 'webp';
-                                statusHtml += `<img src="https://cdn.discordapp.com/emojis/${custom.emoji.id}.${ext}?size=44&quality=lossless" style="height:1.2em; vertical-align:middle; margin-right:4px;"> `;
-                            } else {
-                                statusHtml += custom.emoji.name + " ";
-                            }
-                        }
-                        statusHtml += custom.state || '';
-                        dStatusText.innerHTML = statusHtml;
-                    } else if (game) {
-                        dStatusText.textContent = `Playing ${game.name}`;
-                    } else {
-                        dStatusText.textContent = user.discord_status.toUpperCase();
-                    }
+                if (data.success) {
+                    updateDiscordUI(data.data);
+                    localStorage.setItem('OBSCURA_DISCORD_CACHE', JSON.stringify(data.data));
                 }
-            })
-            .catch(e => console.error("Discord load failed:", e));
+            }).catch(() => {});
+
+        // Setup WebSocket for REAL-TIME updates
+        if (lanyardWS) lanyardWS.close();
+        lanyardWS = new WebSocket("wss://api.lanyard.rest/socket");
+
+        lanyardWS.onopen = () => {
+            lanyardWS.send(JSON.stringify({ op: 2, d: { subscribe_to_id: lanyardId } }));
+        };
+
+        lanyardWS.onmessage = (msg) => {
+            const data = JSON.parse(msg.data);
+            if (data.t === "INIT_STATE" || data.t === "PRESENCE_UPDATE") {
+                updateDiscordUI(data.d);
+                localStorage.setItem('OBSCURA_DISCORD_CACHE', JSON.stringify(data.d));
+            }
+        };
+
+        lanyardWS.onclose = () => {
+            setTimeout(fetchDiscord, 5000); // Auto-reconnect
+        };
     };
+
+    // Load from cache instantly
+    const cached = localStorage.getItem('OBSCURA_DISCORD_CACHE');
+    if (cached) { try { updateDiscordUI(JSON.parse(cached)); } catch(e){} }
 
     // Observers / Scroll Anims
     const scrollObserver = new IntersectionObserver((entries) => {
@@ -337,26 +365,123 @@ document.addEventListener("DOMContentLoaded", () => {
         if (timeBox) timeBox.textContent = new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
     }, 1000);
 
+    // Tab Title Typing Effect
+    let titleIndex = 0;
+    let titleDirection = 1;
+    const updateTitleType = () => {
+        const fullTitle = window.CONFIG?.tabName || "@SVYUXU";
+        const currentText = fullTitle.substring(0, titleIndex);
+        document.title = currentText + "|";
+
+        if (titleDirection === 1) {
+            if (titleIndex < fullTitle.length) {
+                titleIndex++;
+                setTimeout(updateTitleType, 200);
+            } else {
+                titleDirection = -1;
+                setTimeout(updateTitleType, 2000); // Wait at end
+            }
+        } else {
+            if (titleIndex > 1) {
+                titleIndex--;
+                setTimeout(updateTitleType, 100);
+            } else {
+                titleDirection = 1;
+                setTimeout(updateTitleType, 500); // Wait at start
+            }
+        }
+    };
+    updateTitleType();
+
     // Initial Execution
+    fetchDiscord();           // Load Discord info FIRST
     renderSiteData();        // Render from local CONFIG immediately
     setupEventListeners();    // Connect buttons once
     initializeCloudSync();   // Setup real-time firebase updates
-    fetchDiscord();           // Load Discord info
-    setInterval(fetchDiscord, 30000); // Update discord every 30s
 
-    // Custom Cursor Movement
+    // Custom Cursor & Ranga's Ripple Tail
     const cursor = document.getElementById("cursor");
-    window.addEventListener("mousemove", (e) => {
-        if (cursor) {
-            cursor.style.left = e.clientX + "px";
-            cursor.style.top = e.clientY + "px";
-        }
-    });
+    const canvas = document.getElementById("water-tail");
+    const ctx = canvas ? canvas.getContext("2d") : null;
 
-    document.querySelectorAll("a, button, .nav-item, .tape-link, .enter-btn, .audio-control").forEach(el => {
-        el.addEventListener("mouseenter", () => cursor?.classList.add("cursor-hover"));
-        el.addEventListener("mouseleave", () => cursor?.classList.remove("cursor-hover"));
-    });
+    if (cursor) {
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+        let ripples = [];
+        let lastRippleTime = 0;
+
+        if (canvas) {
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener("resize", resize);
+            resize();
+        }
+
+        window.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.opacity = "1";
+
+            if (canvas) {
+                let now = Date.now();
+                if (now - lastRippleTime > 300) {
+                    ripples.push({
+                        x: mouseX,
+                        y: mouseY,
+                        radius: 0,
+                        maxRadius: Math.random() * 20 + 50,
+                        speed: Math.random() * 0.2 + 0.3,
+                        life: 1,
+                        thickness: 2
+                    });
+                    lastRippleTime = now;
+                }
+            }
+        });
+
+        document.querySelectorAll("a, button, .nav-item, .tape-link, .enter-btn, .audio-control, .social-icon").forEach(el => {
+            el.addEventListener("mouseenter", () => cursor.classList.add("cursor-hover"));
+            el.addEventListener("mouseleave", () => cursor.classList.remove("cursor-hover"));
+        });
+
+        function animateCursorSystem() {
+            // Smooth lerp - exactly like Ranga
+            cursorX += (mouseX - cursorX) * 0.35;
+            cursorY += (mouseY - cursorY) * 0.35;
+
+            cursor.style.left = cursorX + "px";
+            cursor.style.top = cursorY + "px";
+
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = ripples.length - 1; i >= 0; i--) {
+                    let r = ripples[i];
+                    r.radius += r.speed; // Normal speed (slower)
+                    let progress = r.radius / r.maxRadius;
+                    r.life = 1 - Math.pow(progress, 1.5);
+
+                    if (r.life <= 0) {
+                        ripples.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                    ctx.lineWidth = r.thickness;
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${r.life})`;
+                    ctx.shadowColor = `rgba(255, 0, 0, ${r.life * 0.8})`;
+                    ctx.shadowBlur = 5;
+                    ctx.stroke();
+                }
+            }
+            requestAnimationFrame(animateCursorSystem);
+        }
+        animateCursorSystem();
+    }
 
     // Smooth Scroll (Lenis)
     if (typeof Lenis !== 'undefined') {
