@@ -44,6 +44,7 @@ window.CONFIG = {
         description: "OBSCURA RECORDS is an independent music label focused on artist development, music production, and official releases.<br />Our mission is to support talented artists and create high-quality music through collaboration and innovation.",
         inviteUrl: "https://discord.gg/uyvWq2UN",
         siteUrl: "https://obscurarecord.com/",
+        siteName: "VISIT SITE",
         footerTitle: "We Are The Team Of OBSCURA",
         footerDesc: "Join to the server and make music with other producers",
         copyrightText: "COPYRIGHTED BY OBSCURA RECORDS"
