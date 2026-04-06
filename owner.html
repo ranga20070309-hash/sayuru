@@ -671,6 +671,10 @@
                             <input type="url" id="cfg-obscura-siteUrl" class="input-box">
                         </div>
                         <div class="form-group">
+                            <label>Official Site Button Name</label>
+                            <input type="text" id="cfg-obscura-siteName" class="input-box" placeholder="VISIT SITE">
+                        </div>
+                        <div class="form-group">
                             <label>Copyright Text</label>
                             <input type="text" id="cfg-obscura-copyright" class="input-box">
                         </div>
@@ -801,6 +805,7 @@
                     setVal('cfg-obscura-desc', data.obscuraInfo.description);
                     setVal('cfg-obscura-invite', data.obscuraInfo.inviteUrl);
                     setVal('cfg-obscura-siteUrl', data.obscuraInfo.siteUrl || '');
+                    setVal('cfg-obscura-siteName', data.obscuraInfo.siteName || 'VISIT SITE');
                     setVal('cfg-obscura-copyright', data.obscuraInfo.copyrightText);
                     setVal('cfg-obscura-footerTitle', data.obscuraInfo.footerTitle);
                     setVal('cfg-obscura-footerDesc', data.obscuraInfo.footerDesc);
@@ -921,6 +926,7 @@
                     description: getVal('cfg-obscura-desc'),
                     inviteUrl: getVal('cfg-obscura-invite'),
                     siteUrl: getVal('cfg-obscura-siteUrl'),
+                    siteName: getVal('cfg-obscura-siteName'),
                     copyrightText: getVal('cfg-obscura-copyright'),
                     footerTitle: getVal('cfg-obscura-footerTitle'),
                     footerDesc: getVal('cfg-obscura-footerDesc')
