@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         databaseURL: "https://sayuru-admin-panel-default-rtdb.asia-southeast1.firebasedatabase.app/",
         projectId: "sayuru-admin-panel",
         storageBucket: "sayuru-admin-panel.firebasestorage.app",
-        messagingSenderId: "458294443520",
+      a  messagingSenderId: "458294443520",
         appId: "1:458294443520:web:bd8439a8a78811a4f9e2e5"
     };
 
@@ -144,6 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const obsInvite = document.querySelector(".obscura-invite-btn");
             if (obsInvite) obsInvite.href = CONFIG.obscuraInfo.inviteUrl;
+
+            const obsSite = document.getElementById("obscura-site-link");
+            if (obsSite && CONFIG.obscuraInfo.siteUrl) obsSite.href = CONFIG.obscuraInfo.siteUrl;
 
             const fTitle = document.querySelector(".footer-title");
             if (fTitle) fTitle.textContent = CONFIG.obscuraInfo.footerTitle;
