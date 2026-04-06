@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         databaseURL: "https://sayuru-admin-panel-default-rtdb.asia-southeast1.firebasedatabase.app/",
         projectId: "sayuru-admin-panel",
         storageBucket: "sayuru-admin-panel.firebasestorage.app",
-      a  messagingSenderId: "458294443520",
+        messagingSenderId: "458294443520",
         appId: "1:458294443520:web:bd8439a8a78811a4f9e2e5"
     };
 
