@@ -146,7 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (obsInvite) obsInvite.href = CONFIG.obscuraInfo.inviteUrl;
 
             const obsSite = document.getElementById("obscura-site-link");
-            if (obsSite && CONFIG.obscuraInfo.siteUrl) obsSite.href = CONFIG.obscuraInfo.siteUrl;
+            if (obsSite && CONFIG.obscuraInfo) {
+                if (CONFIG.obscuraInfo.siteUrl) obsSite.href = CONFIG.obscuraInfo.siteUrl;
+                if (CONFIG.obscuraInfo.siteName) obsSite.innerHTML = `<i class="fa-solid fa-globe"></i> ${CONFIG.obscuraInfo.siteName}`;
+            }
 
             const fTitle = document.querySelector(".footer-title");
             if (fTitle) fTitle.textContent = CONFIG.obscuraInfo.footerTitle;
